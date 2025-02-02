@@ -42,15 +42,14 @@ local function themeswitcher(day_theme, night_theme)
 end
 
 return {
-	-- { "projekt0n/github-nvim-theme", name = "github-theme" },
-	--[[ {
+	{
 		"catppuccin/nvim",
 		name = "catppuccin",
 		priority = 1000,
 		config = function()
 			themeswitcher("catppuccin-latte", "catppuccin-mocha")
 		end,
-	}, ]]
+	},
 	{
 		"EdenEast/nightfox.nvim",
 		-- config = function()
@@ -65,42 +64,79 @@ return {
 			require("nightfox")
 			if os.getenv("HYPRLAND_INSTANCE_SIGNATURE") == nil then -- check if Hyprland is running
 				vim.cmd("colorscheme elflord")
-			else
-				themeswitcher("dayfox", "rose-pine-main")
+				-- else
+				-- 	themeswitcher("dayfox", "rose-pine-main")
 			end
 		end,
 	},
-	-- { "Mofiqul/dracula.nvim" },
-	-- { "shaunsingh/nord.nvim" },
-	--[[ {
+	{
 		"sainnhe/gruvbox-material",
-		lazy = false,
 		priority = 1000,
 		config = function()
 			-- Optionally configure and load the colorscheme
 			-- directly inside the plugin declaration.
 			vim.g.gruvbox_material_enable_italic = true
-			vim.cmd.colorscheme("gruvbox-material")
+			-- vim.cmd.colorscheme("gruvbox-material")
 		end,
-	}, ]]
-	-- { "marko-cerovac/material.nvim" },
-	--[[ {
+	},
+	{
 		"scottmckendry/cyberdream.nvim",
-		-- lazy = false,
 		priority = 1000,
-	}, ]]
-	--[[ {
+	},
+	{
 		"navarasu/onedark.nvim",
 		config = function()
 			require("onedark").load()
 		end,
-	}, ]]
-	--[[ {
+	},
+	{
 		"folke/tokyonight.nvim",
-		lazy = false,
 		priority = 1000,
 		opts = {},
-	}, ]]
+	},
+	{
+		"xero/miasma.nvim",
+		priority = 1000,
+	},
+	{
+		"comfysage/evergarden",
+		priority = 1000, -- Colorscheme plugin is loaded first before any other plugins
+		opts = {
+			transparent_background = true,
+			variant = "medium", -- 'hard'|'medium'|'soft'
+			overrides = {}, -- add custom overrides
+		},
+	},
+	{
+		"craftzdog/solarized-osaka.nvim",
+		priority = 1000,
+	},
+	{ "marko-cerovac/material.nvim" },
+	{ "projekt0n/github-nvim-theme", name = "github-theme" },
+	{ "nyoom-engineering/oxocarbon.nvim" },
+	{ "miikanissi/modus-themes.nvim", priority = 1000 },
+	{ "Mofiqul/dracula.nvim" },
+	{ "shaunsingh/nord.nvim" },
+	{ "aliqyan-21/darkvoid.nvim" },
+	{ "jackplus-xyz/binary.nvim" },
+	{ "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false, priority = 1000 },
+
+	{
+		"tingey21/telescope-colorscheme-persist.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim" },
+		lazy = false,
+		config = function()
+			require("telescope-colorscheme-persist").setup({
+				file_path = vim.fn.stdpath("cache")
+					.. "/telescope-colorscheme-persist.nvim/.nvim.colorscheme-persist.lua",
+				fallback = "default",
+				picker_opts = require("telescope.themes").get_dropdown(),
+				debug = false,
+				keybind = "<leader>sc",
+			})
+		end,
+	},
+
 	--[[ "f-person/auto-dark-mode.nvim",
 	opts = {
 		update_interval = 1000,
