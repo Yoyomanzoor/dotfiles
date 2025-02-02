@@ -85,9 +85,9 @@ return {
 	},
 	{
 		"navarasu/onedark.nvim",
-		config = function()
-			require("onedark").load()
-		end,
+		-- config = function()
+		-- 	require("onedark").load()
+		-- end,
 	},
 	{
 		"folke/tokyonight.nvim",

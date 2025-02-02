@@ -10,7 +10,7 @@ preview_command = "fastfetch"
 [[session]]
 name = " nvim"
 path = "~"
-startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse | xargs nvim"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
 preview_command = "cat ~/.config/sesh/neovim-logo.txt"
 
 [[session]]
@@ -49,16 +49,16 @@ startup_command = "y"
 [[session]]
 name = " hyprland"
 path = "~/.config/hypr"
-startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse | xargs nvim"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
 
 [[session]]
 name = " medical school"
 path = "~/Documents/MedSchool"
-startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse | xargs nvim"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
 
 [[session]]
 name = " cpp"
 path = "~/Documents/cpp/learning-cpp"
 preview_command = "eza --tree --git --icons --color=always {}"
-startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse | xargs nvim"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
 
