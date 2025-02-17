@@ -2,7 +2,31 @@
 preview_command = "eza --all --git --icons --color=always {}"
 
 [[session]]
-name = " terminal"
+name = " 1 terminal"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = " 2 terminal"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = " 3 terminal"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = " 4 terminal"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = " 5 terminal"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"

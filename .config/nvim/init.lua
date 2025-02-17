@@ -1144,6 +1144,10 @@ require("lazy").setup({
 				"luadoc",
 				"markdown",
 				"markdown_inline",
+				"r",
+				"rnoweb",
+				"latex",
+				"csv",
 				"query",
 				"vim",
 				"vimdoc",
@@ -1196,6 +1200,7 @@ require("lazy").setup({
 	require("custom.plugins.markdown"),
 	require("custom.plugins.notify"),
 	require("custom.plugins.lualine"),
+	require("custom.plugins.r"),
 	-- require("custom.plugins.tabout"),
 	require("mappings"),
 
