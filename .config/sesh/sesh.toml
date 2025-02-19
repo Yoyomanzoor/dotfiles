@@ -7,7 +7,7 @@ path = "~"
 startup_command = "y"
 
 [[session]]
-name = " 1 terminal"
+name = " terminal 1"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
