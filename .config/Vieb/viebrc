@@ -1,0 +1,79 @@
+set darkreader=true
+set darkreaderblocklist+=github
+set darkreaderblocklist+=reddit
+set darkreaderblocklist+=youtube
+set darkreaderblocklist+=stackoverflow
+set darkreaderblocklist+=duckduckgo
+set guinavbar=oninput
+set guitabbar=onupdate
+
+map <A-t> <:set guitabbar=onupdate>
+map <A-r> <:set guitabbar=always>
+nmap b <toCommandMode>b<Space>
+nmap o <toExploreMode>
+nmap O <:tabnew><toExploreMode>
+
+nmap zz <zoomReset>
+nmap zi <zoomIn>
+nmap zo <zoomOut>
+nmap zm 5<zoomIn>
+nmap zr 5<zoomOut>
+
+set useragent=%firefox
+
+set searchwords=
+set searchwords+=gh~https://github.com/search?q=%s
+set searchwords+=r~https://reddit.com/r/%s
+set searchwords+=az~https://www.amazon.com/s?k=%s
+set searchwords+=map~https://www.google.com/maps?hl=en&q=%s
+set searchwords+=w~https://en.wikipedia.org/?search=%s
+set searchwords+=wmc~https://commons.wikimedia.org/w/index.php?search=%s
+set searchwords+=y~https://www.youtube.com/results?search_query=%s
+set searchwords+=so~https://stackoverflow.com/search?q=%s
+set searchwords+=medse~https://medicalsciences.stackexchange.com/search?q=%s
+set searchwords+=am~https://next.amboss.com/us/search?q=%s
+set searchwords+=pb~https://pubmed.ncbi.nlm.nih.gov/?term=%s
+set searchwords+=pbf~https://pubmed.ncbi.nlm.nih.gov/?term=%s&filter=simsearch2.ffrft
+set searchwords+=ab~https://duckduckgo.com/?q=%s+medical+abbreviation
+
+set timeout
+set timeoutlen=1000
+set vimcommand=nvim
+set downloadpath=~/Downloads
+
+vmap > <p.scrollRight>
+pmap > <p.scrollRight>
+vmap <lt> <p.scrollLeft>
+pmap <lt> <p.scrollLeft>
+vmap <Down> <p.moveFastDown>
+pmap <Down> <p.moveFastDown>
+vmap <Up> <p.moveFastUp>
+pmap <Up> <p.moveFastUp>
+vmap <Right> <p.moveFastRight>
+pmap <Right> <p.moveFastRight>
+vmap <Left> <p.moveFastLeft>
+pmap <Left> <p.moveFastLeft>
+vmap <C-Down> <p.moveDown>
+pmap <C-Down> <p.moveDown>
+vmap <C-Up> <p.moveUp>
+pmap <C-Up> <p.moveUp>
+vmap <C-Right> <p.moveRight>
+pmap <C-Right> <p.moveRight>
+vmap <C-Left> <p.moveLeft>
+pmap <C-Left> <p.moveLeft>
+vmap <S-Down> <p.moveSlowDown>
+pmap <S-Down> <p.moveSlowDown>
+vmap <S-Up> <p.moveSlowUp>
+pmap <S-Up> <p.moveSlowUp>
+vmap <S-Right> <p.moveSlowRight>
+pmap <S-Right> <p.moveSlowRight>
+vmap <S-Left> <p.moveSlowLeft>
+pmap <S-Left> <p.moveSlowLeft>
+vmap <C-S-Down> <p.scrollDown>
+pmap <C-S-Down> <p.scrollDown>
+vmap <C-S-Up> <p.scrollUp>
+pmap <C-S-Up> <p.scrollUp>
+vmap <C-S-Right> <p.scrollRight>
+pmap <C-S-Right> <p.scrollRight>
+vmap <C-S-Left> <p.scrollLeft>
+pmap <C-S-Left> <p.scrollLeft>

@@ -798,11 +798,14 @@ require("lazy").setup({
 			--  into multiple repos for maintenance purposes.
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
+			"kdheepak/cmp-latex-symbols",
+			"R-nvim/cmp-r",
 		},
 		config = function()
 			-- See `:help cmp`
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
+			require("cmp_r").setup({})
 			luasnip.config.setup({})
 
 			cmp.setup({
@@ -811,7 +814,9 @@ require("lazy").setup({
 						luasnip.lsp_expand(args.body)
 					end,
 				},
-				completion = { completeopt = "menu,menuone,noinsert" },
+				completion = {
+					completeopt = "menu,menuone,noinsert",
+				},
 
 				-- For an understanding of why these mappings were
 				-- chosen, you will need to read `:help ins-completion`
@@ -874,6 +879,8 @@ require("lazy").setup({
 					{ name = "nvim_lsp" },
 					{ name = "luasnip" },
 					{ name = "path" },
+					{ name = "latex_symbols" },
+					{ name = "cmp_r" },
 				},
 			})
 		end,
@@ -1171,6 +1178,10 @@ require("lazy").setup({
 				"luadoc",
 				"markdown",
 				"markdown_inline",
+				"r",
+				"rnoweb",
+				"latex",
+				"csv",
 				"query",
 				"vim",
 				"vimdoc",
@@ -1220,6 +1231,7 @@ require("lazy").setup({
 	require("custom.plugins.themes"),
 	require("custom.plugins.w3m"),
 	require("custom.plugins.surround"),
+	require("custom.plugins.r"),
 	-- require("mappings"),
 
 	-- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`

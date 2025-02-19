@@ -104,6 +104,7 @@ set -g fish_key_bindings fish_vi_key_bindings
 # fix things I broke (via tmux)
 bind -M insert \e\ck kill-line
 
+zoxide init fish | source
 
 # >>> mamba initialize >>>
 # !! Contents within this block are managed by 'micromamba shell init' !!
