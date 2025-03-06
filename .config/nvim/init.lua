@@ -80,6 +80,10 @@ vim.opt.termguicolors = true
 vim.opt.conceallevel = 1
 ----
 
+---- for Magma
+-- vim.g.python3_host_prog = vim.fn.exepath("python3")
+-- vim.g.loaded_python3_provider = nil
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -88,7 +92,7 @@ vim.opt.conceallevel = 1
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- quick exit buffer
-vim.keymap.set("n", "<leader>x", "<cmd>bd<CR>")
+vim.keymap.set("n", "X", "<cmd>bd<CR>")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
@@ -807,6 +811,7 @@ require("lazy").setup({
 		config = function()
 			-- See `:help cmp`
 			local cmp = require("cmp")
+			local compare = cmp.config.compare
 			local luasnip = require("luasnip")
 			require("cmp_r").setup({})
 			luasnip.config.setup({})
@@ -879,11 +884,20 @@ require("lazy").setup({
 						-- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
 						group_index = 0,
 					},
-					{ name = "nvim_lsp" },
+					-- { name = "jupynium", priority = 1000 },
+					{ name = "nvim_lsp", priority = 100 },
 					{ name = "luasnip" },
 					{ name = "path" },
 					{ name = "latex_symbols" },
 					{ name = "cmp_r" },
+				},
+				sorting = {
+					priority_weight = 1.0,
+					comparators = {
+						compare.score,
+						compare.recently_used,
+						compare.locality,
+					},
 				},
 			})
 		end,
@@ -1208,6 +1222,7 @@ require("lazy").setup({
 	require("custom.plugins.notify"),
 	require("custom.plugins.lualine"),
 	require("custom.plugins.r"),
+	require("custom.plugins.python"),
 	-- require("custom.plugins.tabout"),
 	require("mappings"),
 
