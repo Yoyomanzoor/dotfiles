@@ -1,0 +1,31 @@
+# window frame configurations
+# set window-height 3000
+# set window-width 1000
+# set statusbar-h-padding 0
+# set statusbar-v-padding 0
+# set page-padding 10
+# set window-title-page true
+set guioptions vc
+
+# set scrolling options
+set scroll-step 40
+
+# font size
+# set font "Fira Code 15"
+
+# clipboard configurations
+set selection-clipboard clipboard
+
+# mappings
+
+map j feedkeys "<C-Down>"
+map k feedkeys "<C-Up>"
+map <S-q> quit
+
+# unmap f
+# map f toggle_fullscreen
+# map [fullscreen] f toggle_fullscreen
+
+set recolor true
+set recolor-keephue true
+# set recolor-reverse-video true
