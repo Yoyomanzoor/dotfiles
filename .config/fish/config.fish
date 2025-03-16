@@ -78,7 +78,7 @@ alias conda 'micromamba'
 
 # lab things
 # ----------
-abbr ssh-snitkin 'sudo sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-esnitkin/Project_MDHHS_genomics/Analysis/KPC_regional_transmission/2025_02_Panaroo ~/turbo'
+abbr ssh-snitkin 'sudo sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-esnitkin/Project_MDHHS_genomics/Analysis/KPC_regional_transmission ~/turbo'
 
 # alias home '/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
 
