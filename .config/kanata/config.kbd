@@ -1,14 +1,22 @@
+;; defsrc is still necessary
 (defcfg
-  linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
+  ;; linux-dev /dev/uinput
+  linux-dev (
+    /dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd
+    /dev/input/by-id/usb-OLKB_Planck_Light_0-event-kbd
+    /dev/input/by-path/platform-i8042-serio-0-event-kbd
+  )
   process-unmapped-keys yes
 )
+
 (defsrc
   caps a s d f j k l ;
 )
 (defvar
-  tap-time 200
+  tap-time 150
   hold-time 200
 )
+
 (defalias
   escctrl (tap-hold 100 100 esc lctl)
   a (multi f24 (tap-hold $tap-time $hold-time a lmet))
@@ -20,6 +28,7 @@
   l (multi f24 (tap-hold $tap-time $hold-time l ralt))
   ; (multi f24 (tap-hold $tap-time $hold-time ; rmet))
 )
+
 (deflayer base
   @escctrl @a @s @d @f @j @k @l @;
 )
