@@ -2,164 +2,172 @@ return {
 	{
 		"benlubas/molten-nvim",
 		version = "^1.0.0", -- use version <2.0.0 to avoid breaking changes
+		dependencies = { "3rd/image.nvim" },
 		build = ":UpdateRemotePlugins",
 		init = function()
-			-- this is an example, not a default. Please see the readme for more configuration options
-			vim.g.molten_output_win_max_height = 12
+			-- I find auto open annoying, keep in mind setting this option will require setting
+			-- a keybind for `:noautocmd MoltenEnterOutput` to open the output again
+			vim.g.molten_auto_open_output = false
+
+			-- this guide will be using image.nvim
+			-- Don't forget to setup and install the plugin if you want to view image outputs
+			vim.g.molten_image_provider = "image.nvim"
+
+			-- optional, I like wrapping. works for virt text and the output window
+			vim.g.molten_wrap_output = true
+
+			-- Output as virtual text. Allows outputs to always be shown, works with images, but can
+			-- be buggy with longer images
+			-- vim.g.molten_virt_text_output = true
+
+			-- this will make it so the output shows up below the \`\`\` cell delimiter
+			vim.g.molten_virt_lines_off_by_1 = true
+
+			vim.keymap.set("n", "<leader>mi", ":MoltenInit<CR>", { desc = "[M]olten [I]nit" })
+			vim.keymap.set("n", "<leader>ml", ":MoltenEvaluateLine<CR>", { desc = "[M]olten [L]nit" })
+
+			vim.keymap.set(
+				"n",
+				"<leader>me",
+				":MoltenEvaluateOperator<CR>",
+				{ desc = "[M]olten [E]valuate operator", silent = true }
+			)
+			vim.keymap.set(
+				"n",
+				"<leader>ms",
+				":noautocmd MoltenEnterOutput<CR>",
+				{ desc = "[M]olten open output window", silent = true }
+			)
+			vim.keymap.set(
+				"n",
+				"<leader>mr",
+				":MoltenReevaluateCell<CR>",
+				{ desc = "[M]olten [R]e-eval cell", silent = true }
+			)
+			vim.keymap.set(
+				"v",
+				"<leader>mv",
+				":<C-u>MoltenEvaluateVisual<CR>gv",
+				{ desc = "[M]olten execute [V]isual selection", silent = true }
+			)
+			vim.keymap.set(
+				"n",
+				"<leader>mq",
+				":MoltenHideOutput<CR>",
+				{ desc = "[M]olten close output window", silent = true }
+			)
+			vim.keymap.set("n", "<leader>md", ":MoltenDelete<CR>", { desc = "[M]olten [D]elete cell", silent = true })
+
+			-- if you work with html outputs:
+			vim.keymap.set(
+				"n",
+				"<leader>mx",
+				":MoltenOpenInBrowser<CR>",
+				{ desc = "[M]olten open output in browser", silent = true }
+			)
 		end,
 	},
 	-- {
-	-- 	"dccsillag/magma-nvim",
-	-- 	lazy = false,
-	-- 	version = "*",
-	-- 	run = "UpdateRemotePlugins",
-	-- 	keys = {
-	-- 		{ "<leader>mi", "<cmd>MagmaInit<CR>", desc = "Magma initialize" },
-	-- 		{ "<leader>mo", "<cmd>MagmaEvaluateOperator<CR>", desc = "Magma evaluate operator" },
-	-- 		{ "<leader>ml", "<cmd>MagmaEvaluateLine<CR>", desc = "Magma evaluate line" },
-	-- 		{ "<leader>mv", "<cmd>MagmaEvaluateVisual<CR>", desc = "Magma evaluate selection" },
-	-- 		{ "<leader>mc", "<cmd>MagmaEvaluateOperator<CR>", desc = "Magma reevaluate cell" },
-	-- 		{ "<leader>mr", "<cmd>MagmaRestart!<CR>", desc = "Magma restart" },
-	-- 		{ "<leader>ms", "<cmd>MagmaShowOutput<CR>", desc = "Magma show output" },
-	-- 		{
-	-- 			"<leader>mx",
-	-- 			"<cmd>MagmaInterrupt<CR>",
-	-- 			desc = "Magma interrupt",
-	-- 		},
+	-- 	"quarto-dev/quarto-nvim",
+	-- 	dependencies = {
+	-- 		"jmbuhr/otter.nvim",
+	-- 		"nvim-treesitter/nvim-treesitter",
 	-- 	},
+	-- 	config = function()
+	-- 		local quarto = require("quarto")
+	-- 		quarto.setup({
+	-- 			lspFeatures = {
+	-- 				-- NOTE: put whatever languages you want here:
+	-- 				languages = { "r", "python", "rust" },
+	-- 				chunks = "all",
+	-- 				diagnostics = {
+	-- 					enabled = true,
+	-- 					triggers = { "BufWritePost" },
+	-- 				},
+	-- 				completion = {
+	-- 					enabled = true,
+	-- 				},
+	-- 			},
+	-- 			keymap = {
+	-- 				-- NOTE: setup your own keymaps:
+	-- 				hover = "H",
+	-- 				definition = "gd",
+	-- 				-- rename = "<leader>rn",
+	-- 				references = "gr",
+	-- 				format = "<leader>gf",
+	-- 			},
+	-- 			codeRunner = {
+	-- 				enabled = true,
+	-- 				default_method = "molten",
+	-- 			},
+	-- 		})
+	-- 		local runner = require("quarto.runner")
+	-- 		vim.keymap.set("n", "<leader>qc", runner.run_cell, { desc = "run cell", silent = true })
+	-- 		vim.keymap.set("n", "<leader>qa", runner.run_above, { desc = "run cell and above", silent = true })
+	-- 		vim.keymap.set("n", "<leader>qA", runner.run_all, { desc = "run all cells", silent = true })
+	-- 		vim.keymap.set("n", "<leader>ql", runner.run_line, { desc = "run line", silent = true })
+	-- 		vim.keymap.set("v", "<leader>q", runner.run_range, { desc = "run visual range", silent = true })
+	-- 		vim.keymap.set("n", "<leader>RA", function()
+	-- 			runner.run_all(true)
+	-- 		end, { desc = "run all cells of all languages", silent = true })
+	-- 	end,
 	-- },
-	-- 	{
-	-- 		"kiyoon/jupynium.nvim",
-	-- 		build = "micromamba run -a '' -n jupynium pip install .",
-	-- 		config = function()
-	-- 			require("jupynium").setup({
-	-- 				--- For Conda environment named "jupynium",
-	-- 				python_host = { "micromamba", "run", "-a", "''", "-n", "jupynium", "python" },
-
-	-- 				default_notebook_URL = "localhost:8888/nbclassic",
-
-	-- 				-- Write jupyter command but without "notebook"
-	-- 				-- When you call :JupyniumStartAndAttachToServer and no notebook is open,
-	-- 				-- then Jupynium will open the server for you using this command. (only when notebook_URL is localhost)
-	-- 				-- jupyter_command = "jupyter",
-	-- 				--- For Conda, maybe use base environment
-	-- 				--- then you can `conda install -n base nb_conda_kernels` to switch environment in Jupyter Notebook
-	-- 				jupyter_command = { "micromamba", "run", "-a", "''", "-n", "jupynium", "jupyter" },
-
-	-- 				-- Used when notebook is launched by using jupyter_command.
-	-- 				-- If nil or "", it will open at the git directory of the current buffer,
-	-- 				-- but still navigate to the directory of the current buffer. (e.g. localhost:8888/nbclassic/tree/path/to/buffer)
-	-- 				notebook_dir = nil,
-
-	-- 				-- Used to remember the last session (password etc.).
-	-- 				-- e.g. '~/.mozilla/firefox/profiles.ini'
-	-- 				-- or '~/snap/firefox/common/.mozilla/firefox/profiles.ini'
-	-- 				firefox_profiles_ini_path = nil,
-	-- 				-- nil means the profile with Default=1
-	-- 				-- or set to something like 'default-release'
-	-- 				firefox_profile_name = nil,
-
-	-- 				-- Open the Jupynium server if it is not already running
-	-- 				-- which means that it will open the Selenium browser when you open this file.
-	-- 				-- Related command :JupyniumStartAndAttachToServer
-	-- 				auto_start_server = {
-	-- 					enable = false,
-	-- 					file_pattern = { "*.ju.*" },
-	-- 				},
-
-	-- 				-- Attach current nvim to the Jupynium server
-	-- 				-- Without this step, you can't use :JupyniumStartSync
-	-- 				-- Related command :JupyniumAttachToServer
-	-- 				auto_attach_to_server = {
-	-- 					enable = true,
-	-- 					file_pattern = { "*.ju.*", "*.md" },
-	-- 				},
-
-	-- 				-- Automatically open an Untitled.ipynb file on Notebook
-	-- 				-- when you open a .ju.py file on nvim.
-	-- 				-- Related command :JupyniumStartSync
-	-- 				auto_start_sync = {
-	-- 					enable = false,
-	-- 					file_pattern = { "*.ju.*", "*.md" },
-	-- 				},
-
-	-- 				-- Automatically keep filename.ipynb copy of filename.ju.py
-	-- 				-- by downloading from the Jupyter Notebook server.
-	-- 				-- WARNING: this will overwrite the file without asking
-	-- 				-- Related command :JupyniumDownloadIpynb
-	-- 				auto_download_ipynb = true,
-
-	-- 				-- Automatically close tab that is in sync when you close buffer in vim.
-	-- 				auto_close_tab = true,
-
-	-- 				-- Always scroll to the current cell.
-	-- 				-- Related command :JupyniumScrollToCell
-	-- 				autoscroll = {
-	-- 					enable = true,
-	-- 					mode = "always", -- "always" or "invisible"
-	-- 					cell = {
-	-- 						top_margin_percent = 20,
-	-- 					},
-	-- 				},
-
-	-- 				scroll = {
-	-- 					page = { step = 0.5 },
-	-- 					cell = {
-	-- 						top_margin_percent = 20,
-	-- 					},
-	-- 				},
-
-	-- 				-- Files to be detected as a jupynium file.
-	-- 				-- Add highlighting, keybindings, commands (e.g. :JupyniumStartAndAttachToServer)
-	-- 				-- Modify this if you already have lots of files in Jupytext format, for example.
-	-- 				jupynium_file_pattern = { "*.ju.*" },
-
-	-- 				use_default_keybindings = true,
-	-- 				textobjects = {
-	-- 					use_default_keybindings = true,
-	-- 				},
-
-	-- 				syntax_highlight = {
-	-- 					enable = true,
-	-- 				},
-
-	-- 				-- Dim all cells except the current one
-	-- 				-- Related command :JupyniumShortsightedToggle
-	-- 				shortsighted = false,
-
-	-- 				-- Configure floating window options
-	-- 				-- Related command :JupyniumKernelHover
-	-- 				kernel_hover = {
-	-- 					floating_win_opts = {
-	-- 						max_width = 84,
-	-- 						border = "none",
-	-- 					},
-	-- 				},
-
-	-- 				notify = {
-	-- 					ignore = {
-	-- 						-- "download_ipynb",
-	-- 						-- "error_download_ipynb",
-	-- 						-- "attach_and_init",
-	-- 						-- "error_close_main_page",
-	-- 						-- "notebook_closed",
-	-- 					},
-	-- 				},
-	-- 			})
-
-	-- 			-- You can link highlighting groups.
-	-- 			-- This is the default (when colour scheme is unknown)
-	-- 			-- Try with CursorColumn, Pmenu, Folded etc.
-	-- 			vim.cmd([[
-	-- 			hi! link JupyniumCodeCellSeparator CursorLine
-	-- 			hi! link JupyniumMarkdownCellSeparator CursorLine
-	-- 			hi! link JupyniumMarkdownCellContent CursorLine
-	-- 			hi! link JupyniumMagicCommand Keyword
-	-- ]])
-
-	-- 			-- Please share your favourite settings on other colour schemes, so I can add defaults.
-	-- 			-- Currently, tokyonight is supported.
-	-- 		end,
-	-- 	},
-	-- 	"stevearc/dressing.nvim", -- optional, UI for :JupyniumKernelSelect
+	{
+		"3rd/image.nvim",
+		config = function()
+			require("image").setup({
+				backend = "kitty", -- Kitty will provide the best experience, but you need a compatible terminal
+				max_width = 100, -- tweak to preference
+				max_height = 12, -- ^
+				max_height_window_percentage = math.huge, -- this is necessary for a good experience
+				max_width_window_percentage = math.huge,
+				window_overlap_clear_enabled = true,
+				processor = "magick_rock", -- or "magick_cli"
+				integrations = {
+					markdown = {
+						enabled = false,
+						clear_in_insert_mode = true,
+						download_remote_images = true,
+						only_render_image_at_cursor = true,
+						floating_windows = false, -- if true, images will be rendered in floating markdown windows
+						filetypes = { "markdown", "vimwiki" }, -- markdown extensions (ie. quarto) can go here
+					},
+					neorg = {
+						enabled = true,
+						filetypes = { "norg" },
+					},
+					typst = {
+						enabled = true,
+						filetypes = { "typst" },
+					},
+					html = {
+						enabled = false,
+					},
+					css = {
+						enabled = false,
+					},
+				},
+				window_overlap_clear_ft_ignore = {
+					"cmp_menu",
+					"cmp_docs",
+					"snacks_notif",
+					"scrollview",
+					"scrollview_sign",
+				},
+				editor_only_render_when_focused = false, -- auto show/hide images when the editor gains/looses focus
+				tmux_show_only_in_active_window = true, -- auto show/hide images in the correct Tmux window (needs visual-activity off)
+				hijack_file_patterns = { "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.avif" }, -- render image files as images when opened
+			})
+		end,
+	},
+	{
+		"GCBallesteros/jupytext.nvim",
+		config = function()
+			require("jupytext").setup({
+				style = "markdown",
+				output_extension = "md",
+				force_ft = "markdown",
+			})
+		end,
+	},
 }

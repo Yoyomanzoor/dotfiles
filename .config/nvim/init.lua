@@ -81,6 +81,20 @@ vim.opt.conceallevel = 1
 ----
 
 ---- for Magma
+local function isempty(s)
+	return s == nil or s == ""
+end
+local function use_if_defined(val, fallback)
+	return val ~= nil and val or fallback
+end
+local mamba_prefix = os.getenv("MAMBA_ROOT_PREFIX")
+if not isempty(mamba_prefix) then
+	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
+	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
+else
+	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, "python")
+	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, "python3")
+end
 -- vim.g.python3_host_prog = vim.fn.exepath("python3")
 -- vim.g.loaded_python3_provider = nil
 
@@ -191,6 +205,12 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
+	opts = {
+		rocks = {
+			hererocks = true,
+		},
+	},
+
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 
@@ -1158,20 +1178,45 @@ require("lazy").setup({
 		opts = {
 			ensure_installed = {
 				"bash",
+				"bibtex",
 				"c",
+				"cmake",
+				"csv",
 				"diff",
+				"diff",
+				"fish",
+				"gitcommit",
+				"git_config",
+				"gitignore",
+				"go",
+				"gomod",
 				"html",
+				"html",
+				"hyprlang",
+				"java",
+				"javascript",
+				"json",
+				"julia",
+				"latex",
 				"lua",
 				"luadoc",
 				"markdown",
 				"markdown_inline",
-				"r",
-				"rnoweb",
-				"latex",
-				"csv",
+				"matlab",
+				"meson",
+				"perl",
+				"python",
 				"query",
+				"r",
+				"regex",
+				"rnoweb",
+				"ruby",
+				"rust",
+				"toml",
+				"typescript",
 				"vim",
 				"vimdoc",
+				"yaml",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,
@@ -1190,6 +1235,9 @@ require("lazy").setup({
 		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
 		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
 		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+	},
+	{
+		"nvim-treesitter/nvim-treesitter-context",
 	},
 
 	-- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
