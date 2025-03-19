@@ -827,6 +827,7 @@ require("lazy").setup({
 			"hrsh7th/cmp-path",
 			"kdheepak/cmp-latex-symbols",
 			"R-nvim/cmp-r",
+			"zbirenbaum/copilot-cmp",
 		},
 		config = function()
 			-- See `:help cmp`
