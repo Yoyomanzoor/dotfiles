@@ -8,6 +8,9 @@ return {
 		-- like so:
 		version = "~0.1.0",
 	},
+	{
+		"chrisbra/csv.vim",
+	},
 	-- {
 	-- 	"R-nvim/cmp-r",
 	-- 	{

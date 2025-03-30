@@ -80,6 +80,24 @@ vim.opt.termguicolors = true
 vim.opt.conceallevel = 1
 ----
 
+---- for Magma
+local function isempty(s)
+	return s == nil or s == ""
+end
+local function use_if_defined(val, fallback)
+	return val ~= nil and val or fallback
+end
+local mamba_prefix = os.getenv("MAMBA_ROOT_PREFIX")
+if not isempty(mamba_prefix) then
+	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
+	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
+else
+	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, "python")
+	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, "python3")
+end
+-- vim.g.python3_host_prog = vim.fn.exepath("python3")
+-- vim.g.loaded_python3_provider = nil
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -88,7 +106,7 @@ vim.opt.conceallevel = 1
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- quick exit buffer
-vim.keymap.set("n", "<leader>x", "<cmd>bd<CR>")
+vim.keymap.set("n", "X", "<cmd>bd<CR>")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
@@ -187,6 +205,12 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
+	opts = {
+		rocks = {
+			hererocks = true,
+		},
+	},
+
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 
@@ -803,10 +827,12 @@ require("lazy").setup({
 			"hrsh7th/cmp-path",
 			"kdheepak/cmp-latex-symbols",
 			"R-nvim/cmp-r",
+			"zbirenbaum/copilot-cmp",
 		},
 		config = function()
 			-- See `:help cmp`
 			local cmp = require("cmp")
+			local compare = cmp.config.compare
 			local luasnip = require("luasnip")
 			require("cmp_r").setup({})
 			luasnip.config.setup({})
@@ -879,11 +905,20 @@ require("lazy").setup({
 						-- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
 						group_index = 0,
 					},
-					{ name = "nvim_lsp" },
+					-- { name = "jupynium", priority = 1000 },
+					{ name = "nvim_lsp", priority = 100 },
 					{ name = "luasnip" },
 					{ name = "path" },
 					{ name = "latex_symbols" },
 					{ name = "cmp_r" },
+				},
+				sorting = {
+					priority_weight = 1.0,
+					comparators = {
+						compare.score,
+						compare.recently_used,
+						compare.locality,
+					},
 				},
 			})
 		end,
@@ -1144,20 +1179,45 @@ require("lazy").setup({
 		opts = {
 			ensure_installed = {
 				"bash",
+				"bibtex",
 				"c",
+				"cmake",
+				"csv",
 				"diff",
+				"diff",
+				"fish",
+				"gitcommit",
+				"git_config",
+				"gitignore",
+				"go",
+				"gomod",
 				"html",
+				"html",
+				"hyprlang",
+				"java",
+				"javascript",
+				"json",
+				"julia",
+				"latex",
 				"lua",
 				"luadoc",
 				"markdown",
 				"markdown_inline",
-				"r",
-				"rnoweb",
-				"latex",
-				"csv",
+				"matlab",
+				"meson",
+				"perl",
+				"python",
 				"query",
+				"r",
+				"regex",
+				"rnoweb",
+				"ruby",
+				"rust",
+				"toml",
+				"typescript",
 				"vim",
 				"vimdoc",
+				"yaml",
 			},
 			-- Autoinstall languages that are not installed
 			auto_install = true,
@@ -1176,6 +1236,9 @@ require("lazy").setup({
 		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
 		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
 		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+	},
+	{
+		"nvim-treesitter/nvim-treesitter-context",
 	},
 
 	-- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -1208,6 +1271,9 @@ require("lazy").setup({
 	require("custom.plugins.notify"),
 	require("custom.plugins.lualine"),
 	require("custom.plugins.r"),
+	require("custom.plugins.python"),
+	require("custom.plugins.ai"),
+	-- require("custom.plugins.cursor"),
 	-- require("custom.plugins.tabout"),
 	require("mappings"),
 
