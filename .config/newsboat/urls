@@ -1,0 +1,19 @@
+# query feeds
+"query:Unread Articles:unread = \"yes\" and tags !# \"pouet\" and tags !# \"page2rss\" and tags !# \"xiv\""
+"query:Unread Articles (1 year old):unread = \"yes\" and tags !# \"pouet\" and tags !# \"page2rss\" and tags !# \"xiv\" and age between 0:365"
+"query:Unread Articles (1 month old):unread = \"yes\" and tags !# \"pouet\" and tags !# \"page2rss\" and tags !# \"xiv\" and age between 0:31"
+"query:Unread Articles (1 week old):unread = \"yes\" and tags !# \"pouet\" and tags !# \"page2rss\" and tags !# \"xiv\" and age between 0:7"
+"query:Unread Articles (favourite):unread = \"yes\" and tags # \"favourite\""
+
+# bioinformatics
+http://connect.biorxiv.org/biorxiv_xml.php?subject=genomics+bioinformatics+bioengineering preprint bioRxiv bioinformatics
+https://rss.arxiv.org/rss/q-bio preprint arXiv bioinformatics
+https://www.nature.com/nbt.rss Nature Nature-Biotechnology bioinformatics
+https://www.nature.com/natmachintell.rss Nature Nature-Machine-Intelligence bioinformatics machine-learning
+https://www.nature.com/natbiomedeng.rss Nature Nature-Biomedical-Engineering bioinformatics biomedical-engineering
+
+# deep learning
+https://medium.com/feed/@samim deep-learning
+#http://gitxiv.com/feed.xml xiv
+http://torch.ch/blog/feed.xml
+
