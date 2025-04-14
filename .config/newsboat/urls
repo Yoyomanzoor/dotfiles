@@ -6,14 +6,23 @@
 "query:Unread Articles (favourite):unread = \"yes\" and tags # \"favourite\""
 
 # bioinformatics
-http://connect.biorxiv.org/biorxiv_xml.php?subject=genomics+bioinformatics+bioengineering preprint bioRxiv bioinformatics
-https://rss.arxiv.org/rss/q-bio preprint arXiv bioinformatics
-https://www.nature.com/nbt.rss Nature Nature-Biotechnology bioinformatics
-https://www.nature.com/natmachintell.rss Nature Nature-Machine-Intelligence bioinformatics machine-learning
-https://www.nature.com/natbiomedeng.rss Nature Nature-Biomedical-Engineering bioinformatics biomedical-engineering
+https://www.nature.com/npjdigitalmed.rss Nature npj-Digital-Medicine bioinformatics open-access science
+http://connect.biorxiv.org/biorxiv_xml.php?subject=genomics+bioinformatics+bioengineering preprint bioRxiv bioinformatics open-access science
+https://rss.arxiv.org/rss/q-bio preprint arXiv bioinformatics open-access science
+https://www.nature.com/nbt.rss Nature Nature-Biotechnology bioinformatics science
+https://www.nature.com/natmachintell.rss Nature Nature-Machine-Intelligence bioinformatics machine-learning science
+https://www.nature.com/natbiomedeng.rss Nature Nature-Biomedical-Engineering bioinformatics biomedical-engineering science
+https://www.thelancet.com/rssfeed/landig_current.xml The-Lancet The-Lancet-Digital-Health bioinformatics science
+https://www.technologyreview.com/feed/ MIT-Technology-Review bioinformatics science
+https://www.cell.com/cell/inpress.rss Cell science
+
+# neuroscience
+https://www.thelancet.com/rssfeed/laneur_current.xml The-Lancet The-Lancet-Neurology neuroscience science medicine
 
 # deep learning
 https://medium.com/feed/@samim deep-learning
 #http://gitxiv.com/feed.xml xiv
 http://torch.ch/blog/feed.xml
 
+# digest
+https://www.science.org/rss/news_current.xml Science science digest
