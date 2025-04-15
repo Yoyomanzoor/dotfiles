@@ -38,3 +38,4 @@ video/ogg=mpv.desktop
 video/webm=mpv.desktop
 x-scheme-handler/http=vieb.desktop
 x-scheme-handler/https=vieb.desktop
+x-scheme-handler/discord=vesktop.desktop

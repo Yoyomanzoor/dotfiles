@@ -1,0 +1,28 @@
+reload-time 3600
+browser "vieb %u"
+include /usr/share/doc/newsboat/contrib/colorschemes/inkpot
+goto-next-feed no
+
+# unbind keys
+unbind-key j
+unbind-key k
+unbind-key l
+unbind-key h
+
+# bind keys - vim style
+bind-key j down feedlist
+bind-key k up feedlist
+bind-key j next articlelist
+bind-key k prev articlelist
+bind-key J next-feed articlelist
+bind-key K prev-feed articlelist
+bind-key j down article
+bind-key k up article
+bind-key l open
+bind-key h quit
+
+macro p set browser "boatreader %u"; open-in-browser; set browser "vieb %u"
+
+bookmark-cmd bookmarks
+bookmark-interactive no
+bookmark-autopilot yes
