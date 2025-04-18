@@ -20,9 +20,16 @@ https://www.cell.com/cell/inpress.rss Cell science
 https://www.thelancet.com/rssfeed/laneur_current.xml The-Lancet The-Lancet-Neurology neuroscience science medicine
 
 # deep learning
-https://medium.com/feed/@samim deep-learning
+https://medium.com/feed/@samim deep-learning ai
 #http://gitxiv.com/feed.xml xiv
 http://torch.ch/blog/feed.xml
+
+# blogs
+https://situational-awareness.ai/feed/ ai blog
+https://www.astralcodexten.com/feed/ ai blog
+https://scottaaronson.blog/?feed=rss2 quantum blog
+https://www.lesswrong.com/feed.xml?view=curated-rss ai blog
+https://gwern.substack.com/feed blog
 
 # digest
 https://www.science.org/rss/news_current.xml Science science digest
