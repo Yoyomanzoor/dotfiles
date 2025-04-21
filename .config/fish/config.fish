@@ -81,6 +81,9 @@ alias conda 'micromamba'
 abbr ssh-snitkin 'sudo sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-esnitkin/Project_MDHHS_genomics/Analysis/KPC_regional_transmission ~/turbo'
 abbr ssh-welch 'sudo sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-welchjd/smanzoor ~/turbo'
 
+alias vpn_connect '/opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt'
+alias vpn_disconnect '/opt/cisco/secureclient/bin/vpn disconnect'
+
 # alias home '/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
 
 # Get the error messages from journalctl
