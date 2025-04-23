@@ -1,1 +1,2 @@
 https://www.biorxiv.org/content/10.1101/2025.04.07.647689v1?rss=1	SCARF: Single Cell ATAC-seq and RNA-seq Foundation model	
+https://www.nature.com/articles/s41746-025-01603-4?error=cookies_not_supported&code=08eb1a15-020b-45e5-83c9-49044a82da06	Genomic language models could transform medicine but not yet	
