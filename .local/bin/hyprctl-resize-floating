@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Script to resize window if floating to center of screen with 50% width and 95% height
+# https://github.com/hyprwm/Hyprland/issues/9515
+# https://www.reddit.com/r/hyprland/comments/17ief4q/noob_can_i_bind_the_windows_inner_outer_gap_size/
+
+is_floating=$(hyprctl activewindow -j | jq '.floating' | awk '{print $1}')
+
+if [[ $is_floating == "true" ]]; then
+
+  json=$(hyprctl monitors -j | jq '.[] | select(.focused == true)')
+
+  # Get the screen dimensions
+  screen_width=$(echo "$json" | jq '.width')
+  screen_height=$(echo "$json" | jq '.height')
+
+  # Calculate the new dimensions
+  new_width=$((screen_width / 2))
+  new_height=$((screen_height * 95 / 100))
+
+  # Center the window on the screen
+  # x_offset=$((screen_width / 2 - new_width / 2))
+  # y_offset=$((screen_height / 2 - new_height / 2))
+
+  # Resize and move the window
+  hyprctl dispatch centerwindow
+  hyprctl dispatch resizeactive exact "$new_width" "$new_height"
+else
+  echo "The active window is not floating."
+fi
+
+
