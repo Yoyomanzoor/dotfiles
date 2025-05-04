@@ -89,8 +89,12 @@ local function use_if_defined(val, fallback)
 end
 local mamba_prefix = os.getenv("MAMBA_ROOT_PREFIX")
 if not isempty(mamba_prefix) then
-	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
-	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
+	if vim.fn.isdirectory(mamba_prefix .. "/envs/py3.12/bin/python") then
+		vim.g.python_host_prog = mamba_prefix .. "/envs/py3.12/bin/python"
+		vim.g.python3_host_prog = mamba_prefix .. "/envs/py3.12/bin/python"
+	end
+	-- vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
+	-- vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
 else
 	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, "python")
 	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, "python3")
@@ -118,6 +122,7 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("t", "<C-w>", "C-\\><C-w>", { desc = "Cut word in terminal mode" })
 
 -- Save and quit while in normal mode
 vim.keymap.set("n", "Q", "<cmd>x<CR>")

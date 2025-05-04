@@ -81,10 +81,10 @@ return {
 			-- 	vim.api.nvim_feedkeys("g@_", "n", false)
 			-- end)
 			-- Send whole file
-			vim.keymap.set("n", [[<leader>tf]], function()
+			vim.keymap.set("n", [[<leader>tm]], function()
 				set_opfunc(function(motion_type)
 					require("toggleterm").send_lines_to_terminal(motion_type, false, { args = vim.v.count })
-				end)
+				end, { desc = "[T]erminal send [M]otion" })
 				vim.api.nvim_feedkeys("ggg@G''", "n", false)
 			end)
 
