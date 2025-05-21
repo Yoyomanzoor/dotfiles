@@ -1,4 +1,4 @@
 #/usr/bin/sh
 
 # depends on default terminal being set by sesh. See ~/.config/sesh/sesh.toml
-sesh connect " terminal" 
+sesh connect "terminal" 
