@@ -119,6 +119,10 @@ set -g fish_key_bindings fish_vi_key_bindings
 # fix things I broke (via tmux)
 bind -M insert \e\ck kill-line
 
+# some more fun bindings
+bind -M insert \cn 'nvim'
+bind -M insert \cy 'y'
+
 function check_git
    if git rev-parse --is-inside-work-tree > /dev/null 2>&1
       lazygit

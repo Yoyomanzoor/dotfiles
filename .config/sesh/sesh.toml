@@ -7,6 +7,12 @@ path = "~"
 startup_command = "y"
 
 [[session]]
+name = "terminal"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
 name = "terminal_1"
 path = "~"
 startup_command = "fastfetch"
