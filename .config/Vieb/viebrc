@@ -3,7 +3,7 @@ set darkreaderblocklist+=github
 set darkreaderblocklist+=reddit
 set darkreaderblocklist+=youtube
 set darkreaderblocklist+=stackoverflow
-set guinavbar=onupdate
+set guinavbar=oninput
 set guitabbar=onupdate
 
 map <A-t> <:set guitabbar=onupdate>
@@ -24,7 +24,7 @@ set searchwords=
 set searchwords+=gh~https://github.com/search?q=%s
 set searchwords+=r~https://reddit.com/r/%s
 set searchwords+=az~https://www.amazon.com/s?k=%s
-set searchwords+=gm~https://www.google.com/maps?hl=en&q=%s
+set searchwords+=map~https://www.google.com/maps?hl=en&q=%s
 set searchwords+=w~https://en.wikipedia.org/?search=%s
 set searchwords+=wmc~https://commons.wikimedia.org/w/index.php?search=%s
 set searchwords+=y~https://www.youtube.com/results?search_query=%s
@@ -32,6 +32,7 @@ set searchwords+=so~https://stackoverflow.com/search?q=%s
 set searchwords+=medse~https://medicalsciences.stackexchange.com/search?q=%s
 set searchwords+=am~https://next.amboss.com/us/search?q=%s
 set searchwords+=pb~https://pubmed.ncbi.nlm.nih.gov/?term=%s
+set searchwords+=pbf~https://pubmed.ncbi.nlm.nih.gov/?term=%s&filter=simsearch2.ffrft
 set searchwords+=ab~https://duckduckgo.com/?q=%s+medical+abbreviation
 
 set timeout

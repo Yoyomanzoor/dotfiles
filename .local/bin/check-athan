@@ -1,0 +1,167 @@
+#!/usr/bin/python
+
+# yoyomanzoor
+# Uses ipinfo.io to get location and then uses aladhan.com to get prayer times
+
+import os, sys, subprocess, argparse, urllib.request, json, datetime, time, random
+
+parser = argparse.ArgumentParser(description='Get prayer times')
+parser.add_argument('-n', '--notify', action='store_true', help='Send notification for next prayer time')
+parser.add_argument('-d', '--date', action='store_true', help='Get date')
+parser.add_argument('-t', '--time', action='store_true', help='Get time')
+parser.add_argument('-q', '--quran', action='store_true', help='Get Quran verse of the day')
+parser.add_argument('-u', '--update', action='store_true', help='Update datatable')
+parser.add_argument('-s', '--salah', metavar='SALAH', type=str, default='fajr', help='return time for today for SALAH. SALAH can be fajr, sunrise, dhuhr, asr, maghrib, or isha')
+if len(sys.argv) == 1:
+    parser.print_help(sys.stderr)
+    sys.exit(1)
+args = parser.parse_args()
+
+# file to store prayer times for the month
+home = os.path.expanduser('~')
+filename = f'{home}/.local/bin/calendar/{datetime.datetime.now().strftime("%Y-%m")}.json'
+filename_ip = f'{home}/.local/bin/calendar/{datetime.datetime.now().strftime("%Y-%m")}-ip.txt'
+
+convert_from = "%H:%M"
+wanted_time_format = "%I:%M %p"
+
+def initialize(force=False):
+    # create directory for monthly prayer times json files
+    # create monthly prayer times json file if it doesn't exist
+
+    def get_location():
+        # get location from ipinfo.io
+        url = 'https://ipinfo.io/loc'
+        with urllib.request.urlopen(url) as response:
+            ip = response.read().decode('utf-8')
+
+        ip = ip.split('\n')[0].split(',')
+        return ip
+
+    try:
+        os.makedirs(f'{home}/.local/bin/calendar')
+    except FileExistsError:
+        # directory already exists
+        pass
+
+    if not os.path.isfile(filename) or force:
+        # monthly prayer times json file doesn't exist, so we create it
+        ip = get_location()
+        url = f'http://api.aladhan.com/calendar?latitude={ip[0]}&longitude={ip[1]}&school=1&method=99&methodSettings=18,null,15'
+        with urllib.request.urlopen(url) as response:
+            html = response.read()
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(json.loads(html), f, ensure_ascii=False, indent=4)
+        with open(filename_ip, 'w') as f:
+            f.write(f'latitude={ip[0]},longitute={ip[1]}')
+
+    data = json.load(open(filename, encoding='utf-8'))
+    data_today = data['data'][datetime.datetime.now().day-1]
+    return (data, data_today)
+
+def arabnum(western_num):
+    # convert western numbers to arabic numbers
+    t = western_num.maketrans('0123456789', '٠١٢٣٤٥٦٧٨٩')
+    return western_num.translate(t)
+
+def convert_time(time, convert_from, convert_to):
+    # convert time from one format to another
+    return datetime.datetime.strptime(time, convert_from).time().strftime(convert_to)
+
+def notify():
+    # send notification, to be called by hypr once at startup
+    def update():
+        data, data_today = initialize()
+        timings = {k:v.split(' ')[0] for k,v in data_today['timings'].items()}
+        del timings['Sunset']
+        del timings['Imsak']
+        del timings['Midnight']
+        del timings['Firstthird']
+        del timings['Lastthird']
+        timingsInverse = {v:k for k,v in timings.items()}
+        return timingsInverse
+
+    while True:
+        tI = update()
+        i = 0
+        while i<60*23: # refresh every 23 hours to get next day's timings
+            i+=1
+            current_time = datetime.datetime.now().strftime('%H:%M')
+            if current_time in list(tI):
+                subprocess.run(f'notify-send {tI[current_time]} -i "~/.config/dunst/icons/mosque.svg"', shell=True)
+            time.sleep(60)
+
+def athan(salah=None, r=None):
+    # main function
+    # initialize() creates directory and monthly prayer times json file if they don't exist
+    # r is either "date" or "prayer_time"
+    # "date" returns the date in arabic
+    # "prayer_time" returns the next prayer time
+
+    data, data_today = initialize()
+
+    def clean_time(time=salah):
+        return convert_time(data_today['timings'][time.capitalize()].split(' ')[0], convert_from, wanted_time_format)
+
+    if not salah:
+        pass
+    else:
+        if salah.capitalize() in data_today['timings']:
+            print(clean_time())
+        else:
+            print('Usage: check-athan -s SALAH')
+            print('SALAH can be fajr, sunrise, dhuhr, asr, maghrib, or isha')
+
+    if not r:
+        return
+    else:
+        if r == "date":
+            day = data_today['date']['hijri']
+            print(f'{day["weekday"]["ar"]} {arabnum(day["day"])} {day["month"]["ar"]}')
+
+        if r == "prayer_time": #should this be elif?
+            timings = {k:v.split(' ')[0] for k,v in data_today['timings'].items()}
+            del timings['Sunset']
+            del timings['Imsak']
+            del timings['Midnight']
+            del timings['Firstthird']
+            del timings['Lastthird']
+            current_time = datetime.datetime.now().time()
+
+            for name, time in timings.items():
+                datetimed = datetime.datetime.strptime(time, convert_from).time()
+
+                if current_time < datetimed:
+                    next_prayer = [name, convert_time(time, convert_from, wanted_time_format)]
+                    break
+                else:
+                    next_prayer = ['Fajr', convert_time(timings['Fajr'], convert_from, wanted_time_format)]
+                    # next_prayer = [name, convert_time(timings[name], convert_from, wanted_time_format)] # if including lastthird
+
+            print(f'{next_prayer[0]} {next_prayer[1]}')
+
+def quran():
+    # get quran verse of the day
+    url = f'http://api.alquran.cloud/v1/ayah/{random.randint(1, 6236)}'
+    # url = f'http://api.alquran.cloud/v1/ayah/289'
+    with urllib.request.urlopen(url) as response:
+        html = response.read()
+    data = json.loads(html)
+    l = data['data']['text'].split(' ')
+    n = 15
+    output = '\n'.join([' '.join(l[i:i + n]) for i in range(0, len(l), n)]) + f"{data['data']['surah']['name']} {arabnum(str(data['data']['numberInSurah']))}"
+    return output
+    
+
+if args.date:
+    athan(r="date")
+elif args.time:
+    athan(r="prayer_time")
+elif args.notify:
+    notify()
+elif args.quran:
+    print(quran())
+elif args.update:
+    initialize(force=True)
+else:
+    athan(salah=args.salah)

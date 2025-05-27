@@ -1,0 +1,78 @@
+#!/bin/sh
+# Yoyomanzoor
+# BoatReader - A script to take a journal article url from newsboat and open the pdf in zathura
+
+# This script is designed to be used with the newsboat RSS reader
+
+function biorxiv {
+    # Get the URL from the command line argument and point to PDF url
+    url="$1"
+    url=${url%\?*}.full.pdf
+
+    # Use curl to fetch the PDF file and save it to a temporary file
+    tmpfile=$(mktemp /tmp/biorxiv.XXXXXX.pdf)
+    curl -s -L "$url" -o "$tmpfile"
+
+    # Open the PDF file in zathura
+    zathura "$tmpfile"
+}
+
+function npj {
+    # Get the URL from the command line argument and point to PDF url
+    url="$1".pdf
+
+    # Use curl to fetch the PDF file and save it to a temporary file
+    tmpfile=$(mktemp /tmp/npj.XXXXXX.pdf)
+    curl -s -L "$url" -o "$tmpfile"
+
+    # Open the PDF file in zathura
+    zathura "$tmpfile"
+}
+
+function lancetneuro {
+    # Get the URL from the command line argument and point to PDF url
+    url="$1"
+    pdf=echo "$url" | awk -F / '{print $(NF-1)}' | tr -d 'PII'
+    url="https://www.thelancet.com/action/showPdf?pii=$pdf"
+
+    # Use curl to fetch the PDF file and save it to a temporary file
+    tmpfile=$(mktemp /tmp/lancet-neuro.XXXXXX.pdf)
+    curl -s -L "$url" -o "$tmpfile"
+
+    # Open the PDF file in zathura
+    zathura "$tmpfile"
+}
+
+function generic {
+    # Get the URL from the command line argument and generate a PDF with pandoc
+    url="$1"
+    tmpfile=$(mktemp /tmp/generic.XXXXXX.pdf)
+    curl -s -L "$url" | pandoc -f html -t pdf -o "$tmpfile"
+
+    # Open the PDF file in zathura
+    zathura "$tmpfile"
+}
+
+# Based on URL passed to the script, call the appropriate function
+case "$1" in
+    *biorxiv*)
+        biorxiv "$1"
+        ;;
+    *nature.com/articles/*)
+        npj "$1"
+        ;;
+    *laneur*)
+        lancetneuro "$1"
+        ;;
+    *technologyreview*)
+        # For URLs containing "technologyreview", use the generic function
+        generic "$1"
+        ;;
+    *)
+        echo "Unsupported URL: $1"
+        exit 1
+        ;;
+esac
+
+# Clean up temporary files
+trap 'rm -f "$tmpfile"' EXIT

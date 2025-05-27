@@ -1,0 +1,99 @@
+[default_session]
+preview_command = "eza --all --git --icons --color=always {}"
+
+[[session]]
+name = "yazi"
+path = "~"
+startup_command = "y"
+
+[[session]]
+name = "terminal"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = "terminal_1"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = "terminal_2"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = "terminal_3"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = "terminal_4"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = "terminal_5"
+path = "~"
+startup_command = "fastfetch"
+preview_command = "fastfetch"
+
+[[session]]
+name = "nvim"
+path = "~"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
+preview_command = "cat ~/.config/sesh/neovim-logo.txt"
+
+[[session]]
+name = "downloads"
+path = "~/Downloads"
+startup_command = "ls; y"
+
+[[session]]
+name = "music"
+path = "~/Music"
+startup_command = "ls"
+
+[[session]]
+name = "nvim_config"
+path = "~/.config/nvim"
+startup_command = "nvim"
+preview_command = "bat --color=always ~/.config/nvim/init.lua"
+
+[[session]]
+name = "tmux"
+path = "~/.config/tmux"
+startup_command = "nvim tmux.conf"
+preview_command = "bat --color=always ~/.config/tmux/tmux.conf"
+
+[[session]]
+name = "󱂬sesh"
+path = "~/.config/sesh"
+startup_command = "nvim sesh.toml"
+preview_command = "bat --color=always ~/.config/sesh/sesh.toml"
+
+[[session]]
+name = "󰔎hyde"
+path = "~/.config/hyde"
+startup_command = "y"
+
+[[session]]
+name = "hyprland"
+path = "~/.config/hypr"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
+
+[[session]]
+name = "medical_school"
+path = "~/Documents/MedSchool"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
+
+[[session]]
+name = "cpp"
+path = "~/Documents/cpp/learning-cpp"
+preview_command = "eza --tree --git --icons --color=always {}"
+startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='cat {}' | xargs nvim"
+

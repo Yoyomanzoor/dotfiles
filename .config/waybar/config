@@ -44,7 +44,7 @@
         "spacing": 10
     },
     "clock": {
-        "format": "{:%I:%m %p}",
+        "format": "{:%I:%M %p}",
         "format-alt": "{:%Y-%m-%d}"
     },
     "cpu": {

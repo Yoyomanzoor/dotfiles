@@ -1,0 +1,11 @@
+[Unit]
+Description=RClone Google Drive mount
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sh -c 'exec rclone-gdrive.sh'
+Restart=no
+
+[Install]
+WantedBy=default.target
