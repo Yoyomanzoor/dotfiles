@@ -71,7 +71,7 @@ bindsym $mod+Ctrl+Left exec ~/.local/bin/swayworkspace navigate previous
 bindsym $mod+Ctrl+Shift+Right exec ~/.local/bin/swayworkspace move next
 bindsym $mod+Ctrl+Shift+Left exec ~/.local/bin/swayworkspace move previous
 
-bindsym $alt+Tab exec swayselectwindow
+bindsym $mod+Tab exec swayselectwindow
 
 
 # bindsym $mod+s scratchpad show
@@ -153,7 +153,7 @@ workspace_auto_back_and_forth no
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
 
-bindsym $mod+period exec --no-startup-id pkill -USR1 -F "${XDG_RUNTIME_DIR}/swap_focus.pid"
+bindsym $alt+Tab exec --no-startup-id pkill -USR1 -F "${XDG_RUNTIME_DIR}/swap_focus.pid"
 exec --no-startup-id i3-swap-focus
 
 mode "Resize Mode" {
@@ -256,6 +256,7 @@ bindsym $mod+space exec $drun
 # bindsym $mod+space exec --no-startup-id killall wofi || wofi --show drun -I
 bindsym $mod+t exec sesh list | tofi | xargs $term -e sesh connect
 bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
+bindsym $mod+period exec --no-startup-id wofi-emoji
 bindsym $mod+c exec --no-startup-id $term -e nvim
 bindsym $mod+e exec --no-startup-id $term -e yazi
 bindsym $mod+Shift+e exec --no-startup-id $term -e ranger
@@ -263,7 +264,7 @@ bindsym $mod+Alt+e exec --no-startup-id dolphin
 bindsym $mod+Shift+Return exec --no-startup-id vieb
 bindsym $mod+Return exec $term -e sesh connect "terminal_1"
 
-bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB" | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
+bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB: " | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
 bindsym $mod+P exec --no-startup-id nwg-displays
 
 # cursor_trail 3
@@ -288,9 +289,9 @@ bindgesture swipe:right workspace prev
 bindgesture swipe:left workspace next
 
 # TODO: Things to add:
-# - colors/theming
-# - persistent monitor settings
-# - persistent workspaces
-# - wofi launcher (or some launcher)
-# - swayfx/blur
+# - colors/theming manager
+# - [x] persistent monitor settings
+# - [x] persistent workspaces
+# - [x] wofi launcher (or some launcher)
+# - [x] swayfx/blur
 
