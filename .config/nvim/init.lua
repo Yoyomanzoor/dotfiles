@@ -1287,6 +1287,7 @@ require("lazy").setup({
 	require("custom.plugins.r"),
 	require("custom.plugins.python"),
 	require("custom.plugins.ai"),
+	require("custom.plugins.renpy"),
 	-- require("custom.plugins.cursor"),
 	-- require("custom.plugins.tabout"),
 	require("mappings"),
