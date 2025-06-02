@@ -8,6 +8,8 @@ exec systemctl start --user xdg-desktop-portal.service
 set $mod Mod4
 set $alt Mod1
 set $term kitty
+set $scrPath "$HOME/.local/share/bin/"
+set $photoPath "$HOME/Pictures/"
 
 # exec waybar
 bar {
@@ -182,9 +184,9 @@ smart_gaps on
 exec --no-startup-id nm-applet
 exec --no-startup-id blueman-applet
 exec --no-startup-id swww-daemon
-exec --no-startup-id /usr/bin/swaync
+# exec --no-startup-id /usr/bin/swaync
 exec --no-startup-id avizo-service
-bindsym $mod+n exec --no-startup-id swaync-client -t
+# bindsym $mod+n exec --no-startup-id swaync-client -t
 
 # window options
 floating_maximum_size -1 x -1
@@ -249,12 +251,18 @@ bindsym $mod+Shift+c exec $send_reload_pending_tick && swaymsg reload
 ## Session // Power Down // <><Shift> p ##
 bindsym $mod+Shift+p exec killall wlogout || wlogout
 
+# Screenshots
+bindsym $mod+p exec --no-startup-id grim -g "$(slurp)" "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
+bindsym $mod+Ctrl+p exec --no-startup-id grim -g $(swaymsg -t get_tree | jq -r '.. | select(.focused? == true) | .rect | "\(.x),\(.y) \(.width)x\(.height)"') "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
+
+
+
 # set $menu tofi-run | xargs swaymsg exec --
 # bindsym $mod+space exec $menu
 set $drun tofi-drun | xargs swaymsg exec --
 bindsym $mod+space exec $drun
 # bindsym $mod+space exec --no-startup-id killall wofi || wofi --show drun -I
-bindsym $mod+t exec sesh list | tofi | xargs $term -e sesh connect
+bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
 bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
 bindsym $mod+period exec --no-startup-id wofi-emoji
 bindsym $mod+c exec --no-startup-id $term -e nvim
@@ -265,7 +273,7 @@ bindsym $mod+Shift+Return exec --no-startup-id vieb
 bindsym $mod+Return exec $term -e sesh connect "terminal_1"
 
 bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB: " | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
-bindsym $mod+P exec --no-startup-id nwg-displays
+# bindsym $mod+P exec --no-startup-id nwg-displays
 
 # cursor_trail 3
 mouse_warping container
@@ -283,6 +291,7 @@ input type:keyboard {
 input type:touchpad {
     tap enabled
     natural_scroll enabled
+    pointer_accel 0.6
 }
 
 bindgesture swipe:right workspace prev
@@ -294,4 +303,5 @@ bindgesture swipe:left workspace next
 # - [x] persistent workspaces
 # - [x] wofi launcher (or some launcher)
 # - [x] swayfx/blur
+# - [ ] screenshots
 
