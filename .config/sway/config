@@ -256,7 +256,6 @@ bindsym $mod+p exec --no-startup-id grim -g "$(slurp)" "$photoPath/Screenshots/$
 bindsym $mod+Ctrl+p exec --no-startup-id grim -g $(swaymsg -t get_tree | jq -r '.. | select(.focused? == true) | .rect | "\(.x),\(.y) \(.width)x\(.height)"') "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
 
 
-
 # set $menu tofi-run | xargs swaymsg exec --
 # bindsym $mod+space exec $menu
 set $drun tofi-drun | xargs swaymsg exec --
@@ -305,5 +304,7 @@ bindgesture swipe:left workspace next
 # - [x] persistent workspaces
 # - [x] wofi launcher (or some launcher)
 # - [x] swayfx/blur
-# - [ ] screenshots
+# - [x] screenshots
+# - [x] wallpaper quick change
+# - [ ] debug screensharing
 
