@@ -26,15 +26,15 @@ output eDP-1 scale 1 res 2560x1600
 # output eDP-1 pos 0 0 res 2560x1600
 # output HDMI-A-1 pos 2560 0 res 3440x1440@100Hz
 
-workspace 1 output eDP-1
-workspace 2 output eDP-1
-workspace 3 output eDP-1
-workspace 4 output eDP-1
+workspace 5 output eDP-1
+workspace 6 output eDP-1
+workspace 7 output eDP-1
+workspace 8 output eDP-1
 
-workspace 5 output DP-2
-workspace 6 output DP-2
-workspace 7 output DP-2
-workspace 8 output DP-2
+workspace 1 output DP-2
+workspace 2 output DP-2
+workspace 3 output DP-2
+workspace 4 output DP-2
 
 bindsym $mod+Shift+a focus parent
 bindsym $mod+Shift+z focus child
@@ -274,6 +274,8 @@ bindsym $mod+Return exec $term -e sesh connect "terminal_1"
 
 bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB: " | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
 # bindsym $mod+P exec --no-startup-id nwg-displays
+
+bindsym $mod+Shift+w exec --no-startup-id swww img "$(fd --type f -e jpg -e jpeg -e png --exclude .git --full-path $HOME/Pictures | tofi --prompt-text "Select Wallpaper: ")"
 
 # cursor_trail 3
 mouse_warping container
