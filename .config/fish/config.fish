@@ -1,4 +1,5 @@
 set -gx EDITOR nvim
+set -gx BUNDLE_PATH $HOME/.gems
 # set -g fish_greeting
 
 if string match -qir '.*\.utf-?8' -- $LANG $LC_CTYPE
@@ -27,6 +28,16 @@ end
 if status is-interactive
     starship init fish | source
 end
+
+# pomodoro
+function pomodoro 
+  echo $argv[1] | lolcat
+  timer "$argv[2]"
+end
+
+alias po="pomodoro"
+alias wo="pomodoro work 45"
+alias br="pomodoro break 10"
 
 # List Directory
 alias l 'eza -al --color=always --group-directories-first --icons=auto' # preferred listing
