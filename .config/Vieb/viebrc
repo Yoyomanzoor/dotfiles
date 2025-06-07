@@ -6,6 +6,9 @@ set darkreaderblocklist+=stackoverflow
 set darkreaderblocklist+=duckduckgo
 set guinavbar=oninput
 set guitabbar=onupdate
+set followchars=qwertyhome
+
+set adblocker=update
 
 map <A-t> <:set guitabbar=onupdate>
 map <A-r> <:set guitabbar=always>
@@ -37,7 +40,7 @@ set searchwords+=pbf~https://pubmed.ncbi.nlm.nih.gov/?term=%s&filter=simsearch2.
 set searchwords+=ab~https://duckduckgo.com/?q=%s+medical+abbreviation
 
 set timeout
-set timeoutlen=1000
+set timeoutlen=2000
 set vimcommand=nvim
 set downloadpath=~/Downloads
 

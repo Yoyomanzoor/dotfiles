@@ -105,6 +105,14 @@ alias jctl 'journalctl -p 3 -xb'
 # Recent installed packages
 alias rip 'expac --timefmt="%Y-%m-%d %T" "%l\t%n %v" | sort | tail -200 | nl'
 
+# idk why this isnt a builtin
+function fish_remove_path
+  if set -l index (contains -i "$argv" $fish_user_paths)
+    set -e fish_user_paths[$index]
+    echo "Removed $argv from the path"
+  end
+end
+
 # git stuff - doesn't work
 function commit
    if parameter_is_provided $argv
