@@ -9,6 +9,8 @@ image/png=vimiv.desktop;
 image/svg=vimiv.desktop;
 image/tiff=vimiv.desktop;
 image/webp=vimiv.desktop;
+text/html=vieb.desktop;
+application/xhtml+xml=vieb.desktop;
 x-scheme-handler/http=vieb.desktop;
 x-scheme-handler/https=vieb.desktop;
 

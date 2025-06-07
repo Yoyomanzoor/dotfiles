@@ -1,0 +1,310 @@
+include theme
+
+exec systemctl --user import-environment XDG_CURRENT_DESKTOP DISPLAY WAYLAND_DISPLAY SWAYSOCK I3SOCK
+exec dbus-update-activation-environment --systemd XDG_CURRENT_DESKTOP DISPLAY WAYLAND_DISPLAY SWAYSOCK I3SOCK
+
+exec systemctl start --user xdg-desktop-portal.service
+
+set $mod Mod4
+set $alt Mod1
+set $term kitty
+set $scrPath "$HOME/.local/share/bin/"
+set $photoPath "$HOME/Pictures/"
+
+# exec waybar
+bar {
+    swaybar_command swaybar
+    position top
+    # mode hide
+    # modifier Mod4
+}
+
+# set $wm.program.browser wm.program.browser gtk-launch $(xdg-settings get default-web-browser)
+# bindsym $mod+Shift+Return exec --no-startup-id systemd-run --user --scope $wm.program.browser
+
+output eDP-1 scale 1 res 2560x1600
+# output eDP-1 pos 0 0 res 2560x1600
+# output HDMI-A-1 pos 2560 0 res 3440x1440@100Hz
+
+workspace 5 output eDP-1
+workspace 6 output eDP-1
+workspace 7 output eDP-1
+workspace 8 output eDP-1
+
+workspace 1 output DP-2
+workspace 2 output DP-2
+workspace 3 output DP-2
+workspace 4 output DP-2
+
+bindsym $mod+Shift+a focus parent
+bindsym $mod+Shift+z focus child
+bindsym $mod+Left focus left
+bindsym $mod+Right focus right
+bindsym $mod+Up focus up
+bindsym $mod+Down focus down
+bindsym $mod+h focus left
+bindsym $mod+l focus right
+bindsym $mod+k focus up
+bindsym $mod+j focus down
+
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+# bindsym $mod+Ctrl+l workspace next_on_output
+# bindsym $mod+Ctrl+h workspace prev_on_output
+
+# bindsym $mod+1 exec ~/.local/bin/swayworkspace move 1
+# bindsym $mod+2 exec ~/.local/bin/swayworkspace move 2
+# bindsym $mod+3 exec ~/.local/bin/swayworkspace move 3
+# bindsym $mod+4 exec ~/.local/bin/swayworkspace move 4
+
+bindsym $mod+Ctrl+l exec ~/.local/bin/swayworkspace navigate next
+bindsym $mod+Ctrl+h exec ~/.local/bin/swayworkspace navigate previous
+bindsym $mod+Ctrl+Shift+l exec ~/.local/bin/swayworkspace move next
+bindsym $mod+Ctrl+Shift+h exec ~/.local/bin/swayworkspace move previous
+
+bindsym $mod+Ctrl+Right exec ~/.local/bin/swayworkspace navigate next
+bindsym $mod+Ctrl+Left exec ~/.local/bin/swayworkspace navigate previous
+bindsym $mod+Ctrl+Shift+Right exec ~/.local/bin/swayworkspace move next
+bindsym $mod+Ctrl+Shift+Left exec ~/.local/bin/swayworkspace move previous
+
+bindsym $mod+Tab exec swayselectwindow
+
+
+# bindsym $mod+s scratchpad show
+
+## Modify // Window Position // <><Shift> ↑ ↓ ← → ##
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+## Modify // Window Position // <><Shift> k j h l ##
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+## Modify // Containing Workspace // <><Ctrl><Shift> ↑ ↓ ← → ##
+# bindsym $mod+Ctrl+Shift+Left move workspace to output left
+# bindsym $mod+Ctrl+Shift+Right move workspace to output right
+# bindsym $mod+Ctrl+Shift+Up move workspace to output up
+# bindsym $mod+Ctrl+Shift+Down move workspace to output down
+
+## Modify // Containing Workspace // <><Ctrl><Shift> k j h l ##
+# bindsym $mod+Ctrl+Shift+h move workspace to output left
+# bindsym $mod+Ctrl+Shift+l move workspace to output down
+# bindsym $mod+Ctrl+Shift+k move workspace to output up
+# bindsym $mod+Ctrl+Shift+j move workspace to output right
+
+## Modify // Vertical Window Orientation // <> v ##
+bindsym $mod+v split vertical
+
+## Modify // Horizontal Window Orientation // <> g ##
+bindsym $mod+g split horizontal
+
+## Modify // Toggle Window Orientation // <> Backspace ##
+bindsym $mod+BackSpace split toggle
+
+## Modify // Window Fullscreen Toggle // <> f ##
+bindsym $mod+f fullscreen toggle
+
+## Modify // Window Floating Toggle // <><Shift> f ##
+bindsym $mod+Shift+f floating toggle
+
+## Modify // Move to Scratchpad // <><Ctrl> m ##
+bindsym $mod+Ctrl+m move to scratchpad
+
+## Modify // Tile/Float Focus Toggle // <><Shift> t ##
+bindsym $mod+Shift+t focus mode_toggle
+
+## Modify // Window Layout Mode // <> s ##
+bindsym $mod+s layout toggle tabbed splith splitv
+
+# move focused container to workspace
+## Modify // Move Window to Workspace 1 - 10 // <><Shift> 0..9 ##
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+
+# move focused container to workspace, move to workspace
+## Modify // Carry Window to Workspace 1 - 10// <><Ctrl> 0..9 ##
+bindsym $mod+Ctrl+Shift+1 move container to workspace number 1; workspace number 1
+bindsym $mod+Ctrl+Shift+2 move container to workspace number 2; workspace number 2
+bindsym $mod+Ctrl+Shift+3 move container to workspace number 3; workspace number 3
+bindsym $mod+Ctrl+Shift+4 move container to workspace number 4; workspace number 4
+bindsym $mod+Ctrl+Shift+5 move container to workspace number 5; workspace number 5
+bindsym $mod+Ctrl+Shift+6 move container to workspace number 6; workspace number 6
+bindsym $mod+Ctrl+Shift+7 move container to workspace number 7; workspace number 7
+bindsym $mod+Ctrl+Shift+8 move container to workspace number 8; workspace number 8
+bindsym $mod+Ctrl+Shift+9 move container to workspace number 9; workspace number 9
+
+workspace_auto_back_and_forth no
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+bindsym $alt+Tab exec --no-startup-id pkill -USR1 -F "${XDG_RUNTIME_DIR}/swap_focus.pid"
+exec --no-startup-id i3-swap-focus
+
+mode "Resize Mode" {
+    bindsym h resize shrink width 6 px or 6 ppt
+    bindsym j resize grow height 6 px or 6 ppt
+    bindsym k resize shrink height 6 px or 6 ppt
+    bindsym l resize grow width 6 px or 6 ppt
+
+    bindsym Shift+h resize shrink width 24 px or 24 ppt
+    bindsym Shift+j resize grow height 24 px or 24 ppt
+    bindsym Shift+k resize shrink height 24 px or 24 ppt
+    bindsym Shift+l resize grow width 24 px or 24 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "Resize Mode"
+
+bindsym $mod+minus gaps inner current minus 10
+bindsym $mod+equal gaps inner current plus 10
+gaps inner 20
+gaps outer 0
+smart_gaps on
+
+exec --no-startup-id nm-applet
+exec --no-startup-id blueman-applet
+exec --no-startup-id swww-daemon
+# exec --no-startup-id /usr/bin/swaync
+exec --no-startup-id avizo-service
+# bindsym $mod+n exec --no-startup-id swaync-client -t
+
+# window options
+floating_maximum_size -1 x -1
+for_window [class="floating_window"] floating enable
+default_floating_border pixel 5
+default_border pixel 5
+for_window [title=".*"] border pixel 5
+popup_during_fullscreen smart
+# focus_follows_mouse yes
+hide_edge_borders smart
+# client.focused $red $rosewater $rosewater $rosewater
+client.focused #f6c177 #f6c177 #ffffff #eb6f92 #ebbcba
+
+# swayfx
+blur enable
+blur_radius 5
+blur_xray disable
+
+exec swayidle -w \
+    timeout 1800 'gtklock-screen' \
+    timeout 3600 'swaymsg "output * dpms off"' \
+    resume 'swaymsg "output * dpms on"' \
+    before-sleep 'playerctl pause' \
+    before-sleep 'gtklock-screen'
+for_window [class=".*"] inhibit_idle fullscreen
+for_window [app_id=".*"] inhibit_idle fullscreen
+
+# bindsym $mod+Escape exec gtklock-screen
+
+bindsym --locked XF86AudioRaiseVolume exec volumectl up 5
+bindsym --locked XF86AudioLowerVolume exec volumectl down 5
+bindsym --locked XF86AudioMute exec volumectl toggle
+# bindsym --locked XF86AudioMicMute exec volumectl -m %
+bindcode --locked 172 exec playerctl play-pause
+bindcode --locked 208 exec playerctl play
+bindsym --locked XF86AudioPause exec playerctl pause
+bindsym --locked XF86AudioNext exec playerctl next
+bindsym --locked XF86AudioPrev exec playerctl prev
+
+bindsym XF86MonBrightnessUp exec brightnessctl s +5%
+bindsym XF86MonBrightnessDown exec brightnessctl s 5%-
+
+exec playerctld daemon
+exec sway-audio-idle-inhibit
+
+seat * hide_cursor 5000
+seat * hide_cursor when-typing enable
+
+
+## Session // Exit App // <><Shift> q ##
+bindsym $mod+Shift+q [con_id="__focused__"] kill
+
+## Session // Terminate App // <><Alt> q ##
+bindsym $mod+$alt+q [con_id="__focused__"] exec --no-startup-id kill -9 $(xdotool getwindowfocus getwindowpid)
+
+## Session // Reload Sway Config // <><Shift> c ##
+bindsym $mod+Shift+c exec $send_reload_pending_tick && swaymsg reload
+
+## Session // Refresh Session // <><Shift> r ##
+# TODO: make looks refresh program/theming
+
+## Session // Power Down // <><Shift> p ##
+bindsym $mod+Shift+p exec killall wlogout || wlogout
+
+# Screenshots
+bindsym $mod+p exec --no-startup-id grim -g "$(slurp)" "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
+bindsym $mod+Ctrl+p exec --no-startup-id grim -g $(swaymsg -t get_tree | jq -r '.. | select(.focused? == true) | .rect | "\(.x),\(.y) \(.width)x\(.height)"') "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
+
+
+# set $menu tofi-run | xargs swaymsg exec --
+# bindsym $mod+space exec $menu
+set $drun tofi-drun | xargs swaymsg exec --
+bindsym $mod+space exec $drun
+# bindsym $mod+space exec --no-startup-id killall wofi || wofi --show drun -I
+bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
+bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
+bindsym $mod+period exec --no-startup-id wofi-emoji
+bindsym $mod+c exec --no-startup-id $term -e nvim
+bindsym $mod+e exec --no-startup-id $term -e yazi
+bindsym $mod+Shift+e exec --no-startup-id $term -e ranger
+bindsym $mod+Alt+e exec --no-startup-id dolphin
+bindsym $mod+Shift+Return exec --no-startup-id vieb
+bindsym $mod+Return exec $term -e sesh connect "terminal_1"
+
+bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB: " | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
+# bindsym $mod+P exec --no-startup-id nwg-displays
+
+bindsym $mod+Shift+w exec --no-startup-id swww img "$(fd --type f -e jpg -e jpeg -e png --exclude .git --full-path $HOME/Pictures | tofi --prompt-text "Select Wallpaper: ")"
+
+# cursor_trail 3
+mouse_warping container
+focus_follows_mouse yes
+
+set $opacity 1
+for_window [class=".*"] opacity $opacity
+for_window [app_id=".*"] opacity $opacity
+
+input type:keyboard {
+    xkb_layout us,ara
+    xkb_options grp:alt_space_toggle,caps:escape
+}
+
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    pointer_accel 0.6
+}
+
+bindgesture swipe:right workspace prev
+bindgesture swipe:left workspace next
+
+# TODO: Things to add:
+# - colors/theming manager
+# - [x] persistent monitor settings
+# - [x] persistent workspaces
+# - [x] wofi launcher (or some launcher)
+# - [x] swayfx/blur
+# - [x] screenshots
+# - [x] wallpaper quick change
+# - [ ] debug screensharing
+

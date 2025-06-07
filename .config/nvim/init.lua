@@ -73,6 +73,13 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+---- for presenterm
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+	pattern = "*.pres",
+	command = "setfiletype markdown",
+})
+----
+
 ---- for obsidian
 -- 24 bit terminal colors
 vim.opt.termguicolors = true
@@ -1287,6 +1294,7 @@ require("lazy").setup({
 	require("custom.plugins.r"),
 	require("custom.plugins.python"),
 	require("custom.plugins.ai"),
+	require("custom.plugins.renpy"),
 	-- require("custom.plugins.cursor"),
 	-- require("custom.plugins.tabout"),
 	require("mappings"),

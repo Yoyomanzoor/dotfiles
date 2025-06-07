@@ -77,3 +77,5 @@ vmap <C-S-Right> <p.scrollRight>
 pmap <C-S-Right> <p.scrollRight>
 vmap <C-S-Left> <p.scrollLeft>
 pmap <C-S-Left> <p.scrollLeft>
+
+colorscheme rose-pine

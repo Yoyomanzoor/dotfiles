@@ -78,8 +78,10 @@ alias conda 'micromamba'
 
 # lab things
 # ----------
-abbr ssh-snitkin 'sudo sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-esnitkin/Project_MDHHS_genomics/Analysis/KPC_regional_transmission ~/turbo'
-abbr ssh-welch 'sudo sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-welchjd/smanzoor ~/turbo'
+abbr ssh-joanna 'sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-sjoanna/smanzoor ~/turbo'
+abbr ssh-snitkin 'sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-esnitkin/Project_MDHHS_genomics/Analysis/KPC_regional_transmission ~/turbo'
+abbr ssh-welch 'sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:/nfs/turbo/umms-welchjd/smanzoor ~/turbo'
+abbr ssh-home 'sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:./ ~/turbo'
 
 alias vpn_connect '/opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt'
 alias vpn_disconnect '/opt/cisco/secureclient/bin/vpn disconnect'
@@ -122,6 +124,7 @@ bind -M insert \e\ck kill-line
 # some more fun bindings
 bind -M insert \cn 'nvim'
 bind -M insert \cy 'y'
+bind -M insert \ca 'taskwarrior-tui'
 
 function check_git
    if git rev-parse --is-inside-work-tree > /dev/null 2>&1
