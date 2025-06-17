@@ -1260,6 +1260,29 @@ require("lazy").setup({
 	},
 	{
 		"nvim-treesitter/nvim-treesitter-context",
+		config = function()
+			require("treesitter-context").setup({
+				enable = true,
+				multiwindow = true,
+				max_lines = 5,
+				line_numbers = true,
+				mode = "cursor",
+				trim_scope = "outer",
+				separator = nil,
+				multiline_threshold = 20,
+			})
+		end,
+	},
+	{
+		"hedyhli/outline.nvim",
+		lazy = true,
+		cmd = { "Outline", "OutlineOpen" },
+		keys = { -- Example mapping to toggle outline
+			{ "<leader>O", "<cmd>Outline<CR>", desc = "Toggle outline" },
+		},
+		opts = {
+			-- Your setup opts here
+		},
 	},
 
 	-- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
