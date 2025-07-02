@@ -44,8 +44,9 @@
         "spacing": 10
     },
     "clock": {
-        "format": "{:%I:%M %p  %d·%m·%y 󰃭}",
-        "format-alt": "{:%Y-%m-%d}"
+        "format": "{:%I:%M %p  %A %B %e, %Y 󰃭}",
+        "format-alt": "{:%I:%M %p  %d-%m-%Y 󰃭}",
+        "tooptip-format": "<tt><small>{calendar}</small></tt>",
     },
     "cpu": {
         "format": "{usage}% "
