@@ -5,31 +5,127 @@
 "query:Unread Articles (1 week old):unread = \"yes\" and tags !# \"pouet\" and tags !# \"page2rss\" and tags !# \"xiv\" and age between 0:7"
 "query:Unread Articles (favourite):unread = \"yes\" and tags # \"favourite\""
 
+## ----------------
+## Research sources
+
+# Major Journals
+http://www.nature.com/nature/current_issue/rss Nature research favourite
+https://www.cell.com/cell/inpress.rss Cell research favourite
+
 # bioinformatics
-https://www.nature.com/npjdigitalmed.rss Nature npj-Digital-Medicine bioinformatics open-access science
-http://connect.biorxiv.org/biorxiv_xml.php?subject=genomics+bioinformatics+bioengineering preprint bioRxiv bioinformatics open-access science
-https://rss.arxiv.org/rss/q-bio preprint arXiv bioinformatics open-access science
-https://www.nature.com/nbt.rss Nature Nature-Biotechnology bioinformatics science
-https://www.nature.com/natmachintell.rss Nature Nature-Machine-Intelligence bioinformatics machine-learning science
-https://www.nature.com/natbiomedeng.rss Nature Nature-Biomedical-Engineering bioinformatics biomedical-engineering science
-https://www.thelancet.com/rssfeed/landig_current.xml The-Lancet The-Lancet-Digital-Health bioinformatics science
-https://www.technologyreview.com/feed/ MIT-Technology-Review bioinformatics science
-https://www.cell.com/cell/inpress.rss Cell science
+https://www.nature.com/npjdigitalmed.rss Nature npj-Digital-Medicine bioinformatics open-access research
+http://feeds.nature.com/npjsba/rss/current Nature npj-Systems-Biology-and-Applied-Sciences bioinformatics open-access research
+http://www.nature.com/subjects/systems-biology.rss Nature Systems-Biology bioinformatics research
+https://www.nature.com/nbt.rss Nature Nature-Biotechnology bioinformatics research
+https://www.nature.com/natmachintell.rss Nature Nature-Machine-Intelligence bioinformatics AI research
+https://www.nature.com/natbiomedeng.rss Nature Nature-Biomedical-Engineering bioinformatics biomedical-engineering research
+http://feeds.nature.com/natcomputsci/rss/current Nature Nature-Computational-Science bioinformatics research
+https://www.thelancet.com/rssfeed/landig_current.xml The-Lancet The-Lancet-Digital-Health bioinformatics research
+https://www.technologyreview.com/feed/ MIT-Technology-Review bioinformatics research
+http://www.biomedcentral.com/bmcbioinformatics/latest/rss BMC bioinformatics open-access research
+http://connect.biorxiv.org/biorxiv_xml.php?subject=genomics+bioinformatics+bioengineering preprint bioRxiv bioinformatics open-access research
+https://rss.arxiv.org/rss/q-bio preprint arXiv bioinformatics open-access research
+https://us-east1-ml-feeds.cloudfunctions.net/arxiv-ml-reviews preprint arXiv AI reviews open-access research
+https://pubs.rsna.org/action/showMostCitedArticlesFeed?journalCode=ai Radiology-Artificial-Intelligence bioinformatics AI research
 
 # neuroscience
-https://www.thelancet.com/rssfeed/laneur_current.xml The-Lancet The-Lancet-Neurology neuroscience science medicine
+http://www.nature.com/neuro/current_issue/rss/ Nature Nature-Neuroscience neuroscience research
+http://www.nature.com/nrn/current_issue/rss Nature Nature-Reviews-Neuroscience neuroscience research
+http://www.jneurosci.org/rss/current.xml Journal-of-Neuroscience neuroscience research
+http://www.pnas.org/rss/Neuroscience.xml Proceedings-of-the-National-Academy-of-Sciences neuroscience research
+http://www.cell.com/rssFeed/neurosciences/rss.NewArticles.xml Cell neuroscience research
+http://www.biomedcentral.com/bmcneurol/latest/rss BMC neuroscience open-access research medicine neurology
+http://www.biomedcentral.com/bmcneurosci/rss BMC neuroscience open-access research
+https://www.thelancet.com/rssfeed/laneur_current.xml The-Lancet The-Lancet-Neurology neuroscience research medicine
 
-# deep learning
-https://medium.com/feed/@samim deep-learning ai
-#http://gitxiv.com/feed.xml xiv
+# machine learning
+http://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10994&channel-name=Machine+Learning AI research
+
+# medicine
+http://feeds.feedburner.com/NewAndUpdatedSummaries Cochrane-Reviews medicine research
+http://jama.jamanetwork.com/rss/site_3/67.xml JAMA medicine research
+http://www.nejm.org/action/showFeed?jc=nejm&type=etoc&feed=rss New-England-Journal-of-Medicine medicine news research
+http://www.plosmedicine.org/article/feed PLOS-Medicine medicine open-access research
+
+# medical specialties
+http://archneur.jamanetwork.com/rss/site_16/onlineFirst_72.xml JAMA medicine neurology research
+http://journals.lww.com/anatomicpathology/_layouts/OAKS.Journals/feed.aspx?FeedType=MostPopularArticles Anatomic-Pathology medicine pathology journal
+http://journals.lww.com/ajsp/_layouts/OAKS.Journals/feed.aspx?FeedType=MostPopularArticles American-Journal-of-Surgical-Pathology medicine pathology research
+
+## ------------
+## News sources
+
+# popular science
+https://www.science.org/rss/news_current.xml Science-Journal science research digest
+http://rss.slashdot.org/Slashdot/slashdotScience science Slashdot news
+
+# neuroscience
+http://web.mit.edu/newsoffice/topic/mitneuroscience-rss.xml MIT-Technology-Review neuroscience news
+
+# technology, deep learning, and math
+https://news.ycombinator.com/rss technology news
+http://www.physorg.com/rss-feed/technology-news/computer-sciences/ news technology computer-science
+https://www.artificialintelligence-news.com/feed/ AI news
+http://news.mit.edu/rss/topic/artificial-intelligence2 MIT-Technology-Review AI news
+http://web.mit.edu/newsoffice/topic/mitcomputers-rss.xml MIT-Technology-Review computer-science news
+http://news.mit.edu/rss/topic/machine-learning MIT-Technology-Review AI news
+http://topics.nytimes.com/top/reference/timestopics/subjects/a/artificial_intelligence/?rss=1 New-York-Times AI news
+https://techxplore.com/rss-feed/machine-learning-ai-news/ technology AI news
+http://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml Science-Daily AI news
+http://singularityhub.com/feed/ Singularity-Hub AI news
+http://www.guardian.co.uk/technology/artificialintelligenceai/rss The-Guardian AI news
+
+# linux
+http://www.archlinux.org/feeds/news/ linux Arch-Linux news
+http://rss.slashdot.org/Slashdot/slashdotLinux linux Slashdot news
+https://endeavouros.com/feed/ linux EndeavourOS news
+
+## -----
+## Blogs
+
+# technology, deep learning, and math
+https://medium.com/feed/tag/artificial-intelligence AI blog
+https://situational-awareness.ai/feed/ AI blog
 http://torch.ch/blog/feed.xml
+https://www.lesswrong.com/feed.xml?view=curated-rss AI blog math
+https://www.astralcodexten.com/feed/ AI blog
+http://www.stat.columbia.edu/~cook/movabletype/mlm/atom.xml statistics math blog
+https://blog.ml.cmu.edu/feed/ Carnegie-Mellon AI blog
+http://bair.berkeley.edu/blog/feed.xml Berkeley AI Research blog
+#http://gitxiv.com/feed.xml xiv
 
-# blogs
-https://situational-awareness.ai/feed/ ai blog
-https://www.astralcodexten.com/feed/ ai blog
-https://scottaaronson.blog/?feed=rss2 quantum blog
-https://www.lesswrong.com/feed.xml?view=curated-rss ai blog
-https://gwern.substack.com/feed blog
+# data science
+https://medium.com/feed/towards-data-science data-science blog
 
-# digest
-https://www.science.org/rss/news_current.xml Science science digest
+# medicine
+http://www.guardian.co.uk/science/history-science/rss The-Guardian science-history blog
+https://rss.app/feeds/cdvfJsV41NpYLI5d.xml medicine blog
+
+# people
+https://medium.com/feed/@samim deep-learning AI Samim
+https://gwern.substack.com/feed blog AI Gwern
+https://scottaaronson.blog/?feed=rss2 quantum blog Scott-Aaronson
+http://sebastianraschka.com/rss_feed.xml Sebastian-Raschka blog AI
+https://huyenchip.com/feed.xml Chip-Huyen blog AI
+https://jalammar.github.io/feed.xml Jay-Alammar blog AI
+https://www.jeremyjordan.me/rss/ Jeremy-Jordan blog AI
+http://neurocritic.blogspot.com/feeds/posts/default Neurocritic blog neuroscience
+
+# companies
+https://deepmind.com/blog/feed/basic/ DeepMind AI blog
+http://research.microsoft.com/rss/news.xml Microsoft AI blog
+https://blog.openai.com/rss/ OpenAI AI blog
+https://research.fb.com/feed/ Meta AI blog
+https://blog.tensorflow.org/feeds/posts/default TensorFlow AI blog
+
+## ---------
+## Education
+
+# computer science
+http://feeds.feedburner.com/MachineLearningMastery AI education
+
+# medicine
+http://www.clinicalcorrelations.org/?feed=rss2 Clinical-Correlations medicine education
+http://emeddoc.org/?feed=rss2 emergency-medicine education medicine
+http://ilovepathology.com/feed/ pathology education medicine
+https://clinicalproblemsolving.com/feed/ education medicine
