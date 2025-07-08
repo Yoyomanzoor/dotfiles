@@ -22,6 +22,7 @@ macro p set browser "boatreader %u"; open-in-browser; set browser "vieb %u"
 bookmark-cmd bookmarks
 bookmark-interactive no
 bookmark-autopilot yes
+save-path ~/.local/share/rss/
 
 # errors
 error-log ~/.config/newsboat/error.log
@@ -30,6 +31,7 @@ error-log ~/.config/newsboat/error.log
 highlight feedlist "----.*----" yellow default bold
 highlight feedlist ".*0/0.." default default invis
 
+# filters
 define-filter hide-preprint "(tags !# \"source-preprint\")"
 define-filter show-opensource "(tags # \"access-open-access\")"
 define-filter sections "(tags # \"section\")"
