@@ -269,7 +269,7 @@ bindsym $mod+e exec --no-startup-id $term -e yazi
 bindsym $mod+Shift+e exec --no-startup-id $term -e ranger
 bindsym $mod+Alt+e exec --no-startup-id dolphin
 bindsym $mod+Shift+Return exec --no-startup-id vieb
-bindsym $mod+Return exec $term -e sesh connect "terminal_1"
+bindsym $mod+Return exec $term -e sesh connect " terminal_1"
 
 bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB: " | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
 # bindsym $mod+P exec --no-startup-id nwg-displays
