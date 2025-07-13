@@ -96,6 +96,7 @@ abbr ssh-home 'sshfs -o allow_other smanzoor@greatlakes-xfer.arc-ts.umich.edu:./
 
 alias vpn_connect '/opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt'
 alias vpn_disconnect '/opt/cisco/secureclient/bin/vpn disconnect'
+alias vd '/opt/cisco/secureclient/bin/vpn disconnect'
 
 # alias home '/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
 

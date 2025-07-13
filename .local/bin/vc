@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+
+# Expects that username and passwords have been set
+# secret-tool store --label="VPN user" service vpn-user
+# secret-tool store --label="VPN password" service vpn
+# see ~/.config/fish/config.fish for vpn disconnect alias
+
+set username [exec secret-tool lookup service vpn-user]
+set password [exec secret-tool lookup service vpn]
+
+spawn /opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt
+
+expect "Username:"
+send "$username\r"
+
+expect "Password:"
+send "$password\r"
+
+interact
