@@ -1,0 +1,13 @@
+Feed: Cell | Neurosciences
+Title: Genetic architecture of FTLD-TDP pathological subtypes
+Author: Oriol Dols-Icardo, Lianne M. Reus, Alfredo Ramirez
+Date: Tue, 01 Jul 2025 20:00:00 -0400
+Link: https://www.cell.com/trends/neurosciences/fulltext/S0166-2236(25)00125-0?rss=yes
+ 
+Until recently, few genetic risk factors had been identified for the distinct 
+pathological subtypes of frontotemporal lobar degeneration (FTLD) with TDP-43 
+aggregation (FTLD-TDP). In a recent study, Pottier and colleagues addressed this
+gap by identifying common and rare genetic variants associated with FTLD-TDP 
+subtypes, providing novel insights into the underlying mechanisms and 
+heterogeneity of FTLD-TDP.
+

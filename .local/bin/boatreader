@@ -47,6 +47,7 @@ function generic {
     # Get the URL from the command line argument and generate a PDF with pandoc
     url="$1"
     tmpfile=$(mktemp /tmp/generic.XXXXXX.pdf)
+    rm -f "$tmpfile"
     curl -s -L "$url" | pandoc -f html -t pdf -o "$tmpfile"
 
     # Open the PDF file in zathura

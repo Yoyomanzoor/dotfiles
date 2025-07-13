@@ -1,23 +1,42 @@
+# Newsboat configuration file
+# See `man newsboat` for documentation
+# Yoyomanzoor
+
 reload-time 3600
 browser "vieb %u"
 include /usr/share/doc/newsboat/contrib/colorschemes/inkpot
 goto-next-feed no
+show-read-feeds yes
 
-# unbind keys
+# bind keys - vim style
 unbind-key j
 unbind-key k
 unbind-key l
 unbind-key h
-
-# bind keys - vim style
 bind j everywhere down
 bind k everywhere up
+bind ^b everywhere pageup
+bind ^f everywhere pagedown
+bind ^d everywhere halfpagedown
+bind ^u everywhere halfpageup
+
+unbind-key g
+unbind-key G
+bind gg everywhere home
+bind G everywhere end
+bind gs everywhere sort
+bind gr everywhere rev-sort
+bind ^i everywhere prev-dialog
+bind ^o everywhere next-dialog
+
 bind-key J next-feed articlelist
 bind-key K prev-feed articlelist
 bind-key l open
 bind-key h quit
 
 macro p set browser "boatreader %u"; open-in-browser; set browser "vieb %u"
+macro r set browser "vieb %u"
+macro o set browser "w3m %u"; open-in-browser; set browser "vieb %u"
 
 bookmark-cmd bookmarks
 bookmark-interactive no

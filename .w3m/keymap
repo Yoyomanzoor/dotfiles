@@ -239,11 +239,11 @@ keymap :m VIEW_BOOKMARK
 keymap x CLOSE_TAB
 keymap gs GOTO http://www.duckduckgo.com
 keymap gS TAB_GOTO http://www.duckduckgo.com
-keymap C-t NEW_TAB
+keymap gt NEW_TAB
 keymap J NEXT_TAB
 keymap K PREV_TAB
-keymap gt NEXT_TAB
-keymap gT PREV_TAB
+# keymap gt NEXT_TAB
+# keymap gT PREV_TAB
 keymap C-i NEXT_TAB
 keymap C-o PREV_TAB
 keymap C-wL TAB_RIGHT
@@ -256,6 +256,8 @@ keymap ZZ EXIT
 keymap C-Q EXIT
 keymap ZQ QUIT
 keymap :q QUIT
+keymap q QUIT
+keymap Q QUIT
 
 ##### external commands #####
 keymap M-e EDIT_SCREEN
