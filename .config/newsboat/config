@@ -35,8 +35,9 @@ bind-key l open
 bind-key h quit
 
 macro p set browser "boatreader %u"; open-in-browser; set browser "vieb %u"
-macro r set browser "vieb %u"
-macro o set browser "w3m %u"; open-in-browser; set browser "vieb %u"
+macro w set browser "w3m %u"; open-in-browser; set browser "vieb %u"
+macro l set browser "lynx %u"; open-in-browser; set browser "vieb %u"
+macro o set browser "vieb %u"; open-in-browser
 
 bookmark-cmd bookmarks
 bookmark-interactive no
