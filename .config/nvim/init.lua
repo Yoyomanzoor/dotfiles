@@ -319,7 +319,7 @@ require("lazy").setup({
 	{
 		"mbbill/undotree",
 		config = function()
-			vim.keymap.set("n", "<F5>", vim.cmd.UndotreeToggle)
+			vim.keymap.set("n", "<leader>tu", vim.cmd.UndotreeToggle)
 			vim.opt.undodir = "/home/yoyomanzoor/.vim/undodir"
 		end,
 	},
