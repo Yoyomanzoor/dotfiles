@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# This script acts as a wrapper for Newsboat.
+# It triggers a sync before starting Newsboat,
+# then launches Newsboat, waits for it to exit,
+# and finally triggers another sync to synchronize the cache.
+
+# Initialize verbose flag to true (default verbose)
+VERBOSE=true
+
+# Parse command-line arguments
+while getopts "qv" opt; do
+  case $opt in
+    q)
+      VERBOSE=false # Set to quiet mode
+      ;;
+    v)
+      VERBOSE=true # Explicitly set to verbose (redundant if default, but allows overriding -q)
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+# Function to echo messages only if verbose mode is enabled
+verbose_echo() {
+  if [ "$VERBOSE" = true ]; then
+    echo "$@"
+  fi
+}
+
+verbose_echo "Initiating pre-Newsboat cache synchronization..."
+
+# Execute your newsync script before starting Newsboat
+if [ "$VERBOSE" = true ]; then
+  verbose_echo "Running newsync fetch in verbose mode..."
+  newsync -vf
+else
+  verbose_echo "Running newsync fetch in quiet mode..."
+  newsync -f
+fi
+
+verbose_echo "Pre-Newsboat sync complete. Starting Newsboat..."
+
+# Run Newsboat in the foreground.
+# The script will pause here until Newsboat is closed.
+newsboat
+
+verbose_echo "Newsboat closed. Initiating post-Newsboat cache synchronization..."
+
+# Execute your newsync script after Newsboat has closed
+if [ "$VERBOSE" = true ]; then
+  verbose_echo "Running newsync push in verbose mode..."
+  newsync -vp
+else
+  verbose_echo "Running newsync push in quiet mode..."
+  newsync -p
+fi
+
+verbose_echo "Post-Newsboat sync complete."

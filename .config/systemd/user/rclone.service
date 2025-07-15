@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/sh -c 'exec rclone-gdrive.sh'
+ExecStart=/usr/bin/bash -c 'exec ~/.local/bin/rclone-gdrive.sh'
 Restart=no
 
 [Install]

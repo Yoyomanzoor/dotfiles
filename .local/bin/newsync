@@ -1,0 +1,121 @@
+#!/bin/bash
+
+# This script checks for the Newsboat lock file before syncing the cache.
+# It can either fetch the cache from a Google Drive sync directory (-f)
+# or push the cache to the Google Drive sync directory (-p).
+# If the lock file exists, it warns the user and exits, preventing data corruption.
+
+# Initialize flags
+VERBOSE=false
+FETCH_MODE=false
+PUSH_MODE=false
+
+# Parse command-line arguments
+while getopts "vfph" opt; do
+  case $opt in
+    v)
+      VERBOSE=true
+      ;;
+    f)
+      FETCH_MODE=true
+      ;;
+    p)
+      PUSH_MODE=true
+      ;;
+    h)
+      echo "Usage: $(basename "$0") [-v] [-f | -p]"
+      echo ""
+      echo "Options:"
+      echo "  -f    Fetch the cache.db from Google Drive to local."
+      echo "  -p    Push the local cache.db to Google Drive."
+      echo "  -v    Enable verbose output."
+      echo "  -h    Display this help message and exit."
+      echo ""
+      echo "Note: Either -f or -p must be specified, but not both."
+      exit 0
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      echo "Use -h for help." >&2
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+# Function to echo messages only if verbose mode is enabled
+verbose_echo() {
+  if [ "$VERBOSE" = true ]; then
+    echo "$@"
+  fi
+}
+
+# Validate that exactly one of -f or -p is provided
+if [ "$FETCH_MODE" = true ] && [ "$PUSH_MODE" = true ]; then
+    echo "ERROR: Cannot use both -f (fetch) and -p (push) flags simultaneously." >&2
+    echo "Use -h for help." >&2
+    exit 1
+elif [ "$FETCH_MODE" = false ] && [ "$PUSH_MODE" = false ]; then
+    echo "ERROR: Please specify either -f (fetch) or -p (push) mode." >&2
+    echo "Use -h for help." >&2
+    exit 1
+fi
+
+# Define the path to the Newsboat cache lock file
+LOCK_FILE="$HOME/.local/share/newsboat/cache.db.lock"
+
+# Define the path to the Newsboat cache database file
+CACHE_FILE="$HOME/.local/share/newsboat/cache.db"
+
+# Define the destination directory for Google Drive sync via rclone mount
+# Assuming your rclone mount point is at ~/drive
+SYNC_DEST_DIR="$HOME/drive/newsboat"
+SYNC_CACHE_PATH="$SYNC_DEST_DIR/cache.db"
+
+verbose_echo "Checking for Newsboat lock file: $LOCK_FILE"
+
+# Check if the lock file exists
+if [ -f "$LOCK_FILE" ]; then
+    verbose_echo "---------------------------------------------------------"
+    verbose_echo "WARNING: Newsboat lock file found!"
+    verbose_echo "It appears Newsboat is currently running or crashed previously."
+    verbose_echo "Syncing/fetching the cache now could lead to data corruption."
+    verbose_echo "Please close Newsboat or ensure it's not running before trying again."
+    verbose_echo "If you are sure Newsboat is not running, you can manually remove the lock file:"
+    verbose_echo "  rm \"$LOCK_FILE\""
+    verbose_echo "---------------------------------------------------------"
+    exit 1 # Exit with an error code
+else
+    verbose_echo "No lock file found. Proceeding with cache operation."
+
+    # Check if the destination directory exists. If not, exit with an error.
+    if [ ! -d "$SYNC_DEST_DIR" ]; then
+        verbose_echo "---------------------------------------------------------"
+        verbose_echo "ERROR: Destination directory does not exist: $SYNC_DEST_DIR"
+        verbose_echo "Please ensure your rclone mount is active and the directory exists."
+        verbose_echo "---------------------------------------------------------"
+        exit 1 # Exit with an error code
+    fi
+
+    if [ "$PUSH_MODE" = true ]; then
+        verbose_echo "Pushing $CACHE_FILE to $SYNC_CACHE_PATH..."
+        # Copy the cache file from local to the rclone-mounted Google Drive directory
+        cp "$CACHE_FILE" "$SYNC_CACHE_PATH"
+        verbose_echo "Push operation completed: $CACHE_FILE copied to $SYNC_CACHE_PATH"
+    elif [ "$FETCH_MODE" = true ]; then
+        verbose_echo "Fetching $SYNC_CACHE_PATH to $CACHE_FILE..."
+        # Check if the source file exists before fetching
+        if [ ! -f "$SYNC_CACHE_PATH" ]; then
+            verbose_echo "---------------------------------------------------------"
+            verbose_echo "ERROR: Source file not found for fetch operation: $SYNC_CACHE_PATH"
+            verbose_echo "Please ensure the cache.db exists in your Google Drive sync directory."
+            verbose_echo "---------------------------------------------------------"
+            exit 1 # Exit with an error code
+        fi
+        # Copy the cache file from the rclone-mounted Google Drive directory to local
+        cp "$SYNC_CACHE_PATH" "$CACHE_FILE"
+        verbose_echo "Fetch operation completed: $SYNC_CACHE_PATH copied to $CACHE_FILE"
+    fi
+
+    exit 0 # Exit successfully
+fi

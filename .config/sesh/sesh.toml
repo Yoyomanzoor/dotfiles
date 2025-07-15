@@ -51,7 +51,7 @@ preview_command = "cat ~/.config/sesh/neovim-logo.txt"
 [[session]]
 name = "󱀂 news"
 path = "~"
-startup_command = "newsboat"
+startup_command = "nboat"
 preview_command = "newsboat -x print-unread"
 
 [[session]]
