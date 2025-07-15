@@ -29,10 +29,25 @@ bind gr everywhere rev-sort
 bind ^i everywhere prev-dialog
 bind ^o everywhere next-dialog
 
-bind-key J next-feed articlelist
-bind-key K prev-feed articlelist
-bind-key l open
-bind-key h quit
+bind J articlelist next-feed
+bind K articlelist prev-feed
+bind l everywhere open
+
+bind h feedlist view-dialogs
+bind h filebrowser quit
+bind h help quit
+bind h articlelist quit
+bind h article quit
+bind h tagselection quit
+bind h filterselection quit
+bind h urlview quit
+bind h podboat quit
+bind h dirbrowser quit
+bind h searchresultslist quit
+
+bind c everywhere clear-filter
+bind a everywhere article-feed
+bind gh everywhere view-dialogs
 
 bind ^p everywhere macro-prefix
 macro o set browser "boatreader %u"; open-in-browser; set browser "vieb %u"
