@@ -1,19 +1,149 @@
-#!/usr/bin/expect -f
+#!/usr/bin/expect --
 
-# Expects that username and passwords have been set
-# secret-tool store --label="VPN user" service vpn-user
-# secret-tool store --label="VPN password" service vpn
-# see ~/.config/fish/config.fish for vpn disconnect alias
+# This script handles various commands based on command-line arguments.
+#
+# Dependencies:
+#   UM VPN (https://documentation.its.umich.edu/vpn/vpn-linux-vpn-instructions)
+#   Linux (AUR): openssh, scp, expect, libsecret, gnome-keyring
+#
+# It expects that username and password secrets have been stored using:
+# secret-tool store --label="UNIQNAME" service uniqname
+# secret-tool store --label="UM login" service umlogin
+#
+# Usage:
+#   vc -vc          # Connect to VPN
+#   vc -vd          # Disconnect from VPN
+#   vc -s           # SSH to greatlakes
+#   vc -f           # Fetch files from greatlakes-xfer
+#   vc -p           # Push files to greatlakes-xfer
 
-set username [exec secret-tool lookup service vpn-user]
-set password [exec secret-tool lookup service vpn]
+# Procedure to retrieve a secret from secret-tool
+# Arguments:
+#   service_name: The service name used when storing the secret (e.g., "uniqname", "umlogin")
+#   label: The label to display in error messages
+proc get_secret {service_name label} {
+    set secret ""
+    if {[catch {exec secret-tool lookup service $service_name} secret]} {
+        puts "Error: Could not retrieve $label from secret-tool."
+        puts "Please run: secret-tool store --label=\"$label\" service $service_name"
+        exit 1
+    }
+    return $secret
+}
 
-spawn /opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt
+# Procedure to handle the SSH/SCP host key prompt
+proc handle_host_key {} {
+    expect {
+        timeout {
+            puts "\nHost key prompt not received within 1 second. Assuming already accepted or not prompted."
+        }
+        "Are you sure you want to continue connecting*" {
+            send "yes\r"
+            puts "\nAccepted host key."
+        }
+    } -timeout 1
+}
 
-expect "Username:"
-send "$username\r"
+# Procedure to handle the password prompt
+# Arguments:
+#   password: The password to send
+proc handle_password_prompt {password} {
+    expect {
+        timeout {
+            puts "\nError: Connection timed out while waiting for password prompt."
+            exit 1
+        }
+        "*?assword:*" {
+            send "$password\r"
+            puts "\nPassword sent."
+        }
+    }
+}
 
-expect "Password:"
-send "$password\r"
+# Check if at least one argument is provided.
+if {$argc == 0} {
+    puts "Error: No command specified."
+    puts "Usage: [file tail $argv0] < -vc | -vd | -s | -f | -p >"
+    exit 1
+}
 
+# Retrieve secrets using the helper procedure.
+set username [get_secret "uniqname" "UNIQNAME"]
+set password [get_secret "umlogin" "UM login"]
+
+# Get the command from the first argument
+set command [lindex $argv 0]
+
+# Use a switch statement to execute code based on the command
+switch -- $command {
+    "-vc" {
+        # VPN Connect Command
+        puts "Attempting VPN connection..."
+        spawn /opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt
+
+        expect "Username:"
+        send "$username\r"
+
+        expect "Password:"
+        send "$password\r"
+    }
+
+    "-vd" {
+        # VPN Disconnect Command
+        puts "Attempting VPN disconnection..."
+        spawn /opt/cisco/secureclient/bin/vpn disconnect
+        expect eof
+    }
+
+    "-s" {
+        # SSH Command
+        set hostname "greatlakes.arc-ts.umich.edu"
+        puts "Attempting SSH connection to $hostname..."
+
+        spawn ssh $username@$hostname
+
+        handle_host_key
+        handle_password_prompt $password
+
+        # Specific prompt for SSH to Greatlakes
+        expect "*?asscode*"
+        send "1\r"
+    }
+
+    "-f" {
+        # Fetch from greatlakes-xfer (scp)
+        puts "Clearing local ~/greatlakes directory..."
+        # Use a subshell with 'sh -c' to correctly expand the tilde '~' to the home directory
+        exec /bin/sh -c "rm -rf ~/greatlakes && mkdir -p ~/greatlakes"
+
+        puts "Fetching files from greatlakes-xfer..."
+        set hostname "greatlakes-xfer.arc-ts.umich.edu"
+        # The destination is the user's home directory. scp will create the 'greatlakes' folder there.
+        spawn scp -r "${username}@${hostname}:./greatlakes" "$env(HOME)/"
+
+        handle_host_key
+        handle_password_prompt $password
+    }
+
+    "-p" {
+        # Push to greatlakes-xfer (scp)
+        puts "Pushing local ~/greatlakes directory to greatlakes-xfer..."
+        set hostname "greatlakes-xfer.arc-ts.umich.edu"
+        # The destination is the remote home directory. scp will copy the local 'greatlakes' directory into it.
+        spawn scp -r "$env(HOME)/greatlakes" "${username}@${hostname}:."
+
+        handle_host_key
+        handle_password_prompt $password
+    }
+
+    default {
+        # Invalid Command
+        puts "Error: Unknown command '$command'."
+        puts "Usage: [file tail $argv0] < -vc | -vd | -s | -f | -p >"
+        exit 1
+    }
+}
+
+# After sending the initial commands, 'interact' gives control
+# of the spawned process (VPN, SSH, SCP) back to you.
 interact
