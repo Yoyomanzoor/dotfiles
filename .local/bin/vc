@@ -4,7 +4,7 @@
 #
 # Dependencies:
 #   UM VPN (https://documentation.its.umich.edu/vpn/vpn-linux-vpn-instructions)
-#   Linux (AUR): openssh, scp, expect, libsecret, gnome-keyring
+#   Linux (AUR): openssh, scp, expect, libsecret, gnome-keyring, tigervnc (for vncviewer)
 #
 # It expects that username and password secrets have been stored using:
 # secret-tool store --label="UNIQNAME" service uniqname
@@ -14,6 +14,7 @@
 #   vc -vc          # Connect to VPN
 #   vc -vd          # Disconnect from VPN
 #   vc -s           # SSH to greatlakes
+#   vc -i "ssh_cmd" # Create SSH tunnel and launch VNC for an interactive session
 #   vc -f           # Fetch files from greatlakes-xfer
 #   vc -p           # Push files to greatlakes-xfer
 
@@ -60,10 +61,57 @@ proc handle_password_prompt {password} {
     }
 }
 
+# Procedure to check if an SSH tunnel already exists
+# Arguments:
+#   ssh_command: The full SSH command string used to establish the tunnel (for reference)
+#   local_port: The local port used in the SSH tunnel
+# Returns: 1 if tunnel exists, 0 otherwise
+proc check_tunnel_exists {ssh_command local_port} {
+    # We need to be more specific. Look for 'ssh', '-f', '-N', and the specific '-L local_port:'.
+    # This pattern is highly specific to background port-forwarding tunnels.
+    set search_pattern "ssh -f -N -L ${local_port}:"
+    set cmd "pgrep -f \"$search_pattern\""
+    
+    if {[catch {exec sh -c $cmd} result]} {
+        # pgrep returns non-zero exit code if no process found
+        return 1
+    } else {
+        # If result is not empty, a process was found
+        if {$result ne ""} {
+            return 0
+        } else {
+            return 1
+        }
+    }
+}
+
+# Procedure to check if vncviewer is already running with the specified local port
+# Arguments:
+#   local_port: The local port vncviewer is expected to connect to
+# Returns: 1 if vncviewer process is found, 0 otherwise
+proc check_vncviewer_exists {local_port} {
+    # Use pgrep to check for vncviewer processes connected to the specific local port
+    # The command string for vncviewer will typically be "vncviewer localhost:PORT"
+    set cmd "pgrep -f \"vncviewer localhost:$local_port\""
+    
+    if {[catch {exec sh -c $cmd} result]} {
+        # pgrep returns non-zero exit code if no process found
+        return 0
+    } else {
+        # If result is not empty, a process was found
+        if {$result ne ""} {
+            return 1
+        } else {
+            return 0
+        }
+    }
+}
+
+
 # Check if at least one argument is provided.
 if {$argc == 0} {
     puts "Error: No command specified."
-    puts "Usage: [file tail $argv0] < -vc | -vd | -s | -f | -p >"
+    puts "Usage: [file tail $argv0] < -vc | -vd | -s | -i | -f | -p >"
     exit 1
 }
 
@@ -114,11 +162,92 @@ switch -- $command {
         interact
     }
 
+    "-i" {
+        # Interactive VNC session via SSH tunnel
+        if {$argc < 2} {
+            puts "Error: -i command requires an SSH command string as an argument."
+            puts "Example: vc -i \"ssh -f -N -L 22595:gl3428.arc-ts.umich.edu:5901 smanzoor@greatlakes.arc-ts.umich.edu\""
+            exit 1
+        }
+        set ssh_command [lindex $argv 1]
+        set local_port ""
+
+        # First, try to extract the local port from the SSH command.
+        # This is needed for the vncviewer check.
+        if {![regexp -- {-L\s+(\d+):} $ssh_command match local_port]} {
+            puts "Error: Could not extract local port from the SSH command."
+            puts "Expected format in command: -L local_port:hostname:remote_port"
+            exit 1
+        }
+
+        # Determine the status of vncviewer and the SSH tunnel
+        set vnc_running [check_vncviewer_exists $local_port]
+        set tunnel_exists [check_tunnel_exists $ssh_command $local_port] ; # Pass local_port for more specific check
+
+        if {$vnc_running} {
+            # Condition 1: VNC viewer is already running. Gracefully exit.
+            puts "VNC viewer is already running for localhost:$local_port. Exiting."
+            exit 0
+        } elseif {$tunnel_exists} {
+            # Condition 2: VNC viewer is NOT running, but SSH tunnel IS running.
+            # Skip tunnel creation and launch vncviewer.
+            puts "SSH tunnel already exists. Skipping tunnel creation."
+            puts "Launching VNC viewer for localhost:$local_port."
+            if {[catch {exec vncviewer localhost:$local_port &}]} {
+                puts "Error: Could not launch vncviewer. Is it installed and in your PATH?"
+            }
+        } else {
+            # Condition 3: Neither VNC viewer nor SSH tunnel are running.
+            # Establish SSH tunnel, then launch vncviewer.
+            puts "Neither VNC viewer nor SSH tunnel found. Attempting to establish SSH tunnel..."
+            puts "Executing: $ssh_command"
+
+            spawn {*}$ssh_command
+
+            # Expect password and/or Duo prompts. The `interact` command will allow the user
+            # to handle the Duo prompt manually.
+            expect {
+                "*?assword:*" {
+                    send "$password\r"
+                    puts "\nPassword sent."
+                    # After sending password, continue expecting other patterns in this block.
+                    exp_continue
+                }
+                "*?asscode*" {
+                    # Once the passcode prompt appears, give control to the user.
+                    send "1\r"
+                    puts ">>> The script will resume automatically after authentication is complete."
+                    interact
+                }
+                timeout {
+                     puts "\nError: Connection timed out waiting for password or Duo prompt."
+                     exit 1
+                }
+                eof {
+                    # This can happen if a ControlMaster session is active and no password/Duo is needed.
+                    puts "\nSSH command finished without prompting for password or Duo."
+                    puts "Assuming tunnel is active."
+                }
+            }
+
+            # At this point, interact has returned, meaning the ssh -f process has exited
+            # and the tunnel should be established in the background.
+            puts "\nAuthentication complete. Waiting for tunnel to stabilize..."
+            sleep 2
+
+            puts "Launching VNC viewer for localhost:$local_port."
+            if {[catch {exec vncviewer localhost:$local_port &}]} {
+                puts "Error: Could not launch vncviewer. Is it installed and in your PATH?"
+            }
+        }
+    }
+
     "-f" {
         # Fetch from greatlakes-xfer (scp)
-        puts "Clearing local ~/greatlakes directory..."
+        # puts "Clearing local ~/greatlakes directory..."
         # Use a subshell with 'sh -c' to correctly expand the tilde '~' to the home directory
-        exec /bin/sh -c "rm -rf ~/greatlakes && mkdir -p ~/greatlakes"
+        # exec /bin/sh -c "rm -rf ~/greatlakes && mkdir -p ~/greatlakes"
+        exec /bin/sh -c "mkdir -p ~/greatlakes"
 
         puts "Fetching files from greatlakes-xfer..."
         set hostname "greatlakes-xfer.arc-ts.umich.edu"
@@ -147,11 +276,7 @@ switch -- $command {
     default {
         # Invalid Command
         puts "Error: Unknown command '$command'."
-        puts "Usage: [file tail $argv0] < -vc | -vd | -s | -f | -p >"
+        puts "Usage: [file tail $argv0] < -vc | -vd | -s | -i | -f | -p >"
         exit 1
     }
 }
-
-# After sending the initial commands, 'interact' gives control
-# of the spawned process (VPN, SSH, SCP) back to you.
-# interact
