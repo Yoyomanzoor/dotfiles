@@ -23,14 +23,11 @@ function biorxiv {
 }
 
 function nature_pdf {
-    # Get the URL from the command line argument and point to PDF url
     url="$1".pdf
 
-    # Use curl to fetch the PDF file and save it to a temporary file
     tmpfile=$(mktemp /tmp/nature.XXXXXX.pdf)
     curl -s -L "$url" -o "$tmpfile"
 
-    # Open the PDF file in zathura
     zathura "$tmpfile"
 }
 
@@ -50,21 +47,17 @@ function bmc_neurosci {
 }
 
 function lancetneuro {
-    # Get the URL from the command line argument and point to PDF url
     url="$1"
     pdf=echo "$url" | awk -F / '{print $(NF-1)}' | tr -d 'PII'
     url="https://www.thelancet.com/action/showPdf?pii=$pdf"
 
-    # Use curl to fetch the PDF file and save it to a temporary file
     tmpfile=$(mktemp /tmp/lancet-neuro.XXXXXX.pdf)
     curl -s -L "$url" -o "$tmpfile"
 
-    # Open the PDF file in zathura
     zathura "$tmpfile"
 }
 
 function generic {
-    # Get the URL from the command line argument and generate a PDF with pandoc
     url="$1"
     tmpfile=$(mktemp /tmp/generic.XXXXXX.pdf)
     rm -f "$tmpfile"
@@ -75,7 +68,6 @@ function generic {
         return 1
     fi
 
-    # Open the PDF file in zathura
     zathura "$tmpfile"
 }
 
