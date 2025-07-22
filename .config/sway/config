@@ -270,11 +270,14 @@ bindsym $mod+Shift+e exec --no-startup-id $term -e ranger
 bindsym $mod+Alt+e exec --no-startup-id dolphin
 bindsym $mod+Shift+Return exec --no-startup-id vieb
 bindsym $mod+Return exec $term -e sesh connect " terminal_1"
+bindsym $mod+a exec --no-startup-id killall rofi || rofi -show drun
 
 bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | tofi --prompt-text "PDF/EPUB: " | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
+bindsym $mod+m exec --no-startup-id fd --type f -e mp4 -e mov . ~ --exclude .git | tofi --prompt-text "󱇒 " | sed "s/^/'/;s/$/'/" | ifne xargs mpv
 # bindsym $mod+P exec --no-startup-id nwg-displays
 
-bindsym $mod+Shift+w exec --no-startup-id swww img "$(fd --type f -e jpg -e jpeg -e png --exclude .git --full-path $HOME/Pictures | tofi --prompt-text "Select Wallpaper: ")"
+# Wallpaper
+bindsym $mod+Shift+w exec --no-startup-id swww img "$(fd --type f -e jpg -e jpeg -e png --exclude .git --exclude drive --full-path $HOME/Pictures | rofi -dmenu -p "Select Wallpaper: ")"
 
 # cursor_trail 3
 mouse_warping container
