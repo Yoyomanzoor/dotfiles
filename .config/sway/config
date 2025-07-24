@@ -263,7 +263,7 @@ bindsym $mod+space exec $drun
 # bindsym $mod+space exec --no-startup-id killall wofi || wofi --show drun -I
 bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
 bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
-bindsym $mod+period exec --no-startup-id wofi-emoji
+bindsym $mod+period exec --no-startup-id rofi-emoji
 bindsym $mod+c exec --no-startup-id $term -e nvim
 bindsym $mod+e exec --no-startup-id $term -e yazi
 bindsym $mod+Shift+e exec --no-startup-id $term -e ranger
