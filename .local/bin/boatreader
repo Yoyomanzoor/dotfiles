@@ -4,6 +4,11 @@
 
 # This script is designed to be used with the newsboat RSS reader
 
+get_title_from_url() {
+  local URL="$1"
+  wget -qO- "$URL" | gawk -v IGNORECASE=1 -v RS='</title' 'RT{gsub(/.*<title[^>]*>/,"");print;exit}'
+}
+
 function biorxiv {
     # Get the URL from the command line argument and point to PDF url
     url="$1"
@@ -17,12 +22,24 @@ function biorxiv {
     zathura "$tmpfile"
 }
 
-function npj {
-    # Get the URL from the command line argument and point to PDF url
+function nature_pdf {
     url="$1".pdf
 
+    tmpfile=$(mktemp /tmp/nature.XXXXXX.pdf)
+    curl -s -L "$url" -o "$tmpfile"
+
+    zathura "$tmpfile"
+}
+
+function bmc_neurosci {
+    # https://bmcneurosci.biomedcentral.com/articles/10.1186/s12868-025-00959-3
+    # https://bmcneurosci.biomedcentral.com/counter/pdf/10.1186/s12868-025-00959-3.pdf
+    # Get the URL from the command line argument and point to PDF url
+    url="$1"
+    url=$(echo "$url" | sed 's/\/articles\//\/counter\/pdf\//g; s/$/.pdf/g')
+
     # Use curl to fetch the PDF file and save it to a temporary file
-    tmpfile=$(mktemp /tmp/npj.XXXXXX.pdf)
+    tmpfile=$(mktemp /tmp/bmc.XXXXXX.pdf)
     curl -s -L "$url" -o "$tmpfile"
 
     # Open the PDF file in zathura
@@ -30,28 +47,40 @@ function npj {
 }
 
 function lancetneuro {
-    # Get the URL from the command line argument and point to PDF url
     url="$1"
     pdf=echo "$url" | awk -F / '{print $(NF-1)}' | tr -d 'PII'
     url="https://www.thelancet.com/action/showPdf?pii=$pdf"
 
-    # Use curl to fetch the PDF file and save it to a temporary file
     tmpfile=$(mktemp /tmp/lancet-neuro.XXXXXX.pdf)
     curl -s -L "$url" -o "$tmpfile"
 
-    # Open the PDF file in zathura
     zathura "$tmpfile"
 }
 
 function generic {
-    # Get the URL from the command line argument and generate a PDF with pandoc
     url="$1"
     tmpfile=$(mktemp /tmp/generic.XXXXXX.pdf)
     rm -f "$tmpfile"
-    curl -s -L "$url" | pandoc -f html -t pdf -o "$tmpfile"
 
-    # Open the PDF file in zathura
+    wkhtmltopdf "$url" "$tmpfile"
+    if [ $? -ne 0 ]; then
+        echo "wkhtmltopdf failed to convert the URL to PDF."
+        return 1
+    fi
+
     zathura "$tmpfile"
+}
+
+function nature {
+    # Check if the URL is a article from a journal if " | " is in the title
+    # Otherwise, it is assumed to be a news article and not have a PDF url
+    title=$(get_title_from_url "$1")
+    if echo "$title" | grep -qE " \| "; then
+        nature_pdf "$1"
+        return
+    else
+        generic "$1"
+    fi
 }
 
 # Based on URL passed to the script, call the appropriate function
@@ -60,7 +89,10 @@ case "$1" in
         biorxiv "$1"
         ;;
     *nature.com/articles/*)
-        npj "$1"
+        nature "$1"
+        ;;
+    *bmcneurosci*)
+        bmc_neurosci "$1"
         ;;
     *laneur*)
         lancetneuro "$1"
