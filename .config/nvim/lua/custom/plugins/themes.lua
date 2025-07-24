@@ -46,9 +46,9 @@ return {
 		"catppuccin/nvim",
 		name = "catppuccin",
 		priority = 1000,
-		config = function()
-			themeswitcher("catppuccin-latte", "catppuccin-mocha")
-		end,
+		-- config = function()
+		-- 	themeswitcher("catppuccin-latte", "catppuccin-mocha")
+		-- end,
 	},
 	{
 		"EdenEast/nightfox.nvim",
@@ -59,15 +59,15 @@ return {
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
-		lazy = false,
-		config = function()
-			require("nightfox")
-			if os.getenv("HYPRLAND_INSTANCE_SIGNATURE") == nil then -- check if Hyprland is running
-				vim.cmd("colorscheme elflord")
-				-- else
-				-- 	themeswitcher("dayfox", "rose-pine-main")
-			end
-		end,
+		-- lazy = false,
+		-- config = function()
+		-- 	require("nightfox")
+		-- 	if os.getenv("HYPRLAND_INSTANCE_SIGNATURE") == nil then -- check if Hyprland is running
+		-- 		vim.cmd("colorscheme elflord")
+		-- 		-- else
+		-- 		-- 	themeswitcher("dayfox", "rose-pine-main")
+		-- 	end
+		-- end,
 	},
 	{
 		"sainnhe/gruvbox-material",
@@ -135,6 +135,14 @@ return {
 				keybind = "<leader>sc",
 			})
 		end,
+	},
+	{
+		"lcroberts/persistent-colorscheme.nvim",
+		lazy = false,
+		priority = 1000, -- Plugin should be loaded early
+		dependencies = {
+			"RRethy/nvim-base16", -- Lots of baked-in themes and support to add more
+		},
 	},
 
 	--[[ "f-person/auto-dark-mode.nvim",
