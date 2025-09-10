@@ -1,22 +1,19 @@
 #!/usr/bin/expect --
 
-# This script handles various commands based on command-line arguments.
+# This script handles various commands for managing connections and file transfers
+# with the University of Michigan's Great Lakes cluster.
+#
+# For detailed usage information, run:
+#   vc --help
 #
 # Dependencies:
-#   UM VPN (https://documentation.its.umich.edu/vpn/vpn-linux-vpn-instructions)
-#   Linux (AUR): openssh, scp, expect, libsecret, gnome-keyring, tigervnc (for vncviewer)
+#   - UM VPN (https://documentation.its.umich.edu/vpn/vpn-linux-vpn-instructions)
+#   - Linux (AUR): openssh, scp, expect, libsecret, gnome-keyring, tigervnc (for vncviewer)
 #
-# It expects that username and password secrets have been stored using:
-# secret-tool store --label="UNIQNAME" service uniqname
-# secret-tool store --label="UM login" service umlogin
-#
-# Usage:
-#   vc -vc          # Connect to VPN
-#   vc -vd          # Disconnect from VPN
-#   vc -s           # SSH to greatlakes
-#   vc -i "ssh_cmd" # Create SSH tunnel and launch VNC for an interactive session
-#   vc -f           # Fetch files from greatlakes-xfer
-#   vc -p           # Push files to greatlakes-xfer
+# Setup:
+#   This script expects that your username and password secrets have been stored using secret-tool:
+#   secret-tool store --label="UNIQNAME" service uniqname
+#   secret-tool store --label="UM login" service umlogin
 
 # Procedure to retrieve a secret from secret-tool
 # Arguments:
@@ -107,20 +104,51 @@ proc check_vncviewer_exists {local_port} {
     }
 }
 
+# Procedure to print detailed usage information
+# Arguments:
+#   script_path: The path to the script (from the global argv0 variable)
+proc print_usage {script_path} {
+    set script_name [file tail $script_path]
+    puts "Usage: $script_name <command> \[arguments]"
+    puts ""
+    puts "Description:"
+    puts "  A script to manage connections and file transfers related to University of Michigan's Great Lakes cluster."
+    puts ""
+    puts "Commands:"
+    puts "  -vc             Connect to the UM VPN."
+    puts "  -vd             Disconnect from the UM VPN."
+    puts "  -s              Open an SSH session to the Great Lakes login node."
+    puts "  -i \"ssh_cmd\"    Establish an SSH tunnel and launch a VNC viewer for an interactive session."
+    puts "                  The ssh_cmd must be enclosed in quotes and contain a local port forwarding rule."
+    puts "                  Example: $script_name -i \"ssh -f -N -L 22595:gl-login-node:5901 <uniqname>@greatlakes.arc-ts.umich.edu\""
+    puts "  -f              Fetch the '~/greatlakes' directory from the Great Lakes transfer node."
+    puts "  -p              Push the local '~/greatlakes' directory to the Great Lakes transfer node."
+    puts "  -h, --help      Display this help message."
+    puts ""
+    puts "Prerequisites:"
+    puts "  - UM VPN client, openssh, scp, expect, libsecret, gnome-keyring, tigervnc."
+    puts "  - Secrets stored using secret-tool for 'uniqname' and 'umlogin'."
+}
+
 
 # Check if at least one argument is provided.
 if {$argc == 0} {
-    puts "Error: No command specified."
-    puts "Usage: [file tail $argv0] < -vc | -vd | -s | -i | -f | -p >"
+    print_usage $argv0
     exit 1
+}
+
+# Get the command from the first argument
+set command [lindex $argv 0]
+
+# Handle help command before retrieving secrets
+if {[string equal $command "-h"] || [string equal $command "--help"]} {
+    print_usage $argv0
+    exit 0
 }
 
 # Retrieve secrets using the helper procedure.
 set username [get_secret "uniqname" "UNIQNAME"]
 set password [get_secret "umlogin" "UM login"]
-
-# Get the command from the first argument
-set command [lindex $argv 0]
 
 # Use a switch statement to execute code based on the command
 switch -- $command {
@@ -275,8 +303,9 @@ switch -- $command {
 
     default {
         # Invalid Command
-        puts "Error: Unknown command '$command'."
-        puts "Usage: [file tail $argv0] < -vc | -vd | -s | -i | -f | -p >"
+        puts "Error: Unknown command '$command'.\n"
+        print_usage $argv0
         exit 1
     }
 }
+

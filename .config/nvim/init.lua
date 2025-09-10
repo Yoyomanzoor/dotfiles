@@ -356,6 +356,7 @@ require("lazy").setup({
 
 			-- Useful for getting pretty icons, but requires a Nerd Font.
 			{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
+			{ "nvim-telescope/telescope-bibtex.nvim" },
 		},
 		config = function()
 			-- See `:help telescope` and `:help telescope.setup()`
@@ -377,11 +378,16 @@ require("lazy").setup({
 						filetypes = { "png", "jpg", "mp4", "webm", "pdf" },
 						find_cmd = "rg",
 					},
+					bibtex = {
+						context = true,
+						context_fallback = true,
+					},
 				},
 			})
 
 			require("telescope").load_extension("media_files")
 			require("telescope").load_extension("notify")
+			require("telescope").load_extension("bibtex")
 
 			-- Enable Telescope extensions if they are installed
 			pcall(require("telescope").load_extension, "fzf")
