@@ -186,6 +186,11 @@ screens = [
                 ),
                 widget.TextBox("default config", name="default"),
                 widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+                widget.Battery(
+                    markup=True,
+                    charging_foreground="#008000",
+                    charge_controller=lambda: (0,90)
+                ),
                 # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
                 widget.StatusNotifier(),
                 # widget.Systray(),
