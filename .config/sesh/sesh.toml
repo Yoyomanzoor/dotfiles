@@ -2,11 +2,6 @@
 preview_command = "eza --all --git --icons --color=always {}"
 
 [[session]]
-name = " yazi"
-path = "~"
-startup_command = "y"
-
-[[session]]
 name = " terminal"
 path = "~"
 startup_command = "fastfetch"
@@ -41,6 +36,11 @@ name = " terminal_5"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
+
+[[session]]
+name = " yazi"
+path = "~"
+startup_command = "y"
 
 [[session]]
 name = " nvim"
