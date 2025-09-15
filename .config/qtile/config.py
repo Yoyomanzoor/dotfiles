@@ -170,7 +170,7 @@ extension_defaults = widget_defaults.copy()
 
 screens = [
     Screen(
-        wallpaper="~/Downloads/wallpaper_purple.jpg",
+        wallpaper="~/.config/qtile/wallpaper_purple.jpg",
         wallpaper_mode="fill",
         bottom=bar.Bar(
             [
