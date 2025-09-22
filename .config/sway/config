@@ -278,7 +278,8 @@ bindsym $mod+Ctrl+p exec --no-startup-id grim -g $(swaymsg -t get_tree | jq -r '
 set $drun tofi-drun | xargs swaymsg exec --
 bindsym $mod+space exec $drun
 # bindsym $mod+space exec --no-startup-id killall wofi || wofi --show drun -I
-bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
+bindsym $mod+t exec sesh list | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi | ifne xargs $term -e sesh connect
+# bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
 bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
 bindsym $mod+period exec --no-startup-id rofi-emoji
 bindsym $mod+c exec --no-startup-id $term -e nvim
@@ -287,7 +288,7 @@ bindsym $mod+Shift+e exec --no-startup-id $term -e ranger
 bindsym $mod+Alt+e exec --no-startup-id dolphin
 bindsym $mod+Shift+Return exec --no-startup-id vieb
 bindsym $mod+Return exec $term -e sesh connect " terminal_1"
-bindsym $mod+a exec --no-startup-id killall rofi || rofi -show drun -config ~/.config/rofi/rose-pine.rasi
+bindsym $mod+a exec --no-startup-id killall rofi || rofi -show drun -show-icons -config ~/.config/rofi/rose-pine.rasi
 
 bindsym $mod+z exec --no-startup-id fd --type f -e pdf -e epub --hidden --exclude .git . ~ | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p "PDF/EPUB" | sed "s/^/'/;s/$/'/" | ifne xargs zathura #requires moreutils to be installed
 bindsym $mod+m exec --no-startup-id fd --type f -e mp4 -e mov . ~ --exclude .git | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p "󱇒 " | sed "s/^/'/;s/$/'/" | ifne xargs mpv
