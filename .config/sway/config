@@ -1,7 +1,7 @@
 include theme
 
-exec systemctl --user import-environment XDG_CURRENT_DESKTOP DISPLAY WAYLAND_DISPLAY SWAYSOCK I3SOCK
-exec dbus-update-activation-environment --systemd XDG_CURRENT_DESKTOP DISPLAY WAYLAND_DISPLAY SWAYSOCK I3SOCK
+exec systemctl --user import-environment XDG_CURRENT_DESKTOP DISPLAY WAYLAND_DISPLAY SWAYSOCK I3SOCK XDG_CACHE_HOME XDG_CONFIG_HOME
+exec dbus-update-activation-environment --systemd XDG_CURRENT_DESKTOP DISPLAY WAYLAND_DISPLAY SWAYSOCK I3SOCK XDG_CACHE_HOME XDG_CONFIG_HOME
 
 exec systemctl start --user xdg-desktop-portal.service
 
@@ -252,6 +252,8 @@ exec sway-audio-idle-inhibit
 seat * hide_cursor 5000
 seat * hide_cursor when-typing enable
 
+## Sesion // Exit Sway // <><Ctrl> q ##
+bindsym $mod+Ctrl+q exec $send_reload_pending_tick && swaymsg exit
 
 ## Session // Exit App // <><Shift> q ##
 bindsym $mod+Shift+q [con_id="__focused__"] kill

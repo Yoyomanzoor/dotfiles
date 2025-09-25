@@ -40,7 +40,8 @@ def autostart():
     subprocess.Popen([home])
 
 mod = "mod4"
-terminal = guess_terminal()
+terminal = "kitty"
+# terminal = guess_terminal()
 
 # def app_or_group(group, app):
 #     """ Go to specified group if it exists. Otherwise, run the specified app.

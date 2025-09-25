@@ -84,6 +84,11 @@ alias tarnow 'tar -acf '
 alias untar 'tar -zxvf '
 alias vdir 'vdir --color=auto'
 alias wget 'wget -c '
+alias rt 'trash put'
+alias tp 'trash put'
+alias tl 'trash list'
+alias tr 'trash restore'
+alias please 'sudo'
 
 alias conda 'micromamba'
 
