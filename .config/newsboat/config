@@ -50,12 +50,12 @@ bind a everywhere article-feed
 bind gh everywhere view-dialogs
 
 bind ^p everywhere macro-prefix
-macro o set browser "boatreader %u"; open-in-browser; set browser "vieb %u"
-macro w set browser "w3m %u"; open-in-browser; set browser "vieb %u"
-macro l set browser "lynx %u"; open-in-browser; set browser "vieb %u"
-macro f set browser "firefox %u"; open-in-browser; set browser "vieb %u"
-macro v set browser "vieb %u"; open-in-browser
-macro y set browser "wl-copy %u"; open-in-browser; set browser "vieb %u"
+macro o set browser "boatreader %u"; open-in-browser; set browser "vieb %u" -- "open using boatreader"
+macro w set browser "w3m %u"; open-in-browser; set browser "vieb %u" -- "open using w3m"
+macro l set browser "lynx %u"; open-in-browser; set browser "vieb %u" -- "open using lynx"
+macro f set browser "firefox %u"; open-in-browser; set browser "vieb %u" -- "open using firefox"
+macro v set browser "vieb %u"; open-in-browser -- "open using vieb"
+macro y set browser "wl-copy %u"; open-in-browser; set browser "vieb %u" -- "copy link using wl-copy"
 
 bookmark-cmd bookmarks
 bookmark-interactive no
