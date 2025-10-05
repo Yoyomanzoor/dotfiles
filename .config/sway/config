@@ -277,7 +277,7 @@ exec sway-audio-idle-inhibit
 seat * hide_cursor 5000
 seat * hide_cursor when-typing enable
 
-## Sesion // Exit Sway // <><Ctrl> q ##
+## Session // Exit Sway // <><Ctrl> q ##
 bindsym $mod+Ctrl+q exec $send_reload_pending_tick && swaymsg exit
 
 ## Session // Exit App // <><Shift> q ##
@@ -295,10 +295,12 @@ bindsym $mod+Shift+c exec $send_reload_pending_tick && swaymsg reload
 ## Session // Power Down // <><Shift> p ##
 bindsym $mod+Shift+p exec killall wlogout || wlogout
 
-## Utilities // Screenshots // <> PrintScreen / <><Ctrl> PrintScreen / <> p / <><Ctrl> p ##
+## Scripts // Screenshots // <> PrintScreen / <><Ctrl> PrintScreen / <> p / <><Ctrl> p ##
 bindsym $mod+p exec --no-startup-id grim -g "$(slurp)" "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
 bindsym $mod+Ctrl+p exec --no-startup-id grim -g $(swaymsg -t get_tree | jq -r '.. | select(.focused? == true) | .rect | "\(.x),\(.y) \(.width)x\(.height)"') "$photoPath/Screenshots/$(date +'%y%m%d_%Hh%Mm%Ss_screenshot').png"
 
+## Scripts // Cheatsheet/Help // <><Shift> / ##
+bindsym $mod+Shift+slash exec --no-startup-id swaycheatsheet.py ~/.config/sway/config
 
 ## Programs // Application Launcher // ##
 # set $menu tofi-run | xargs swaymsg exec --
