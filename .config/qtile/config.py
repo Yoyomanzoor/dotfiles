@@ -102,6 +102,7 @@ keys = [
     Key([mod, "shift"], "Return", lazy.spawn("vieb"), desc="Launch browser"),
     Key([mod], "t", lazy.spawn("sesh list | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi | ifne xargs " + str(terminal) + " -e sesh connect", shell=True), desc="Toggle floating on the focused window"),
     Key([mod], "a", lazy.spawn("rofi -show drun -show-icons -case-smart -config ~/.config/rofi/rose-pine.rasi", shell=True), desc="Application launcher"),
+    Key([mod], "z", lazy.spawn("""fd --type f -e pdf -e epub --hidden --exclude .git . ~ | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p "PDF/EPUB" | sed "s/^/'/;s/$/'/" | ifne xargs zathura""", shell=True), desc="Application launcher"),
     Key([mod, "shift"], "p", lazy.spawn("wlogout"), desc="Logout"),
     # Key([mod], "e", lazy.function(app_or_group("", "yazi"))),
 ]
