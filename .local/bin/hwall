@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# ~/.local/bin/hwall (v7.2 - Legacy swww compatible)
+
+# --- Configuration ---
+CONFIG_FILE="$HOME/.config/hwall/config"
+MANIFEST_FILE="$HOME/.cache/hwall/manifest.txt"
+
+# --- Dependency Checks ---
+if ! command -v jq &> /dev/null || ! command -v bc &> /dev/null; then
+    echo "Error: Missing dependencies. Please ensure 'jq' and 'bc' are installed."
+    exit 1
+fi
+
+# --- Read Config ---
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "Error: Config file not found at $CONFIG_FILE"
+    exit 1
+fi
+WALL_PATH=$(grep '^path=' "$CONFIG_FILE" | cut -d'=' -f2-)
+EFFECT_SETTING=$(grep '^effect=' "$CONFIG_FILE" | cut -d'=' -f2-)
+if [[ -z "$WALL_PATH" || ! -d "$WALL_PATH" ]]; then
+    echo "Error: Invalid or missing path in config: '$WALL_PATH'"
+    exit 1
+fi
+
+# --- Auto-Indexing Logic ---
+mkdir -p "$(dirname "$MANIFEST_FILE")"
+touch "$MANIFEST_FILE"
+if ! grep -q "\"$WALL_PATH" "$MANIFEST_FILE"; then
+    echo "ℹ️  Directory '$WALL_PATH' not found in index. Indexing now..."
+    hwall-index "$WALL_PATH"
+    echo "✅  Indexing finished."
+fi
+
+# --- Get Wallpaper Effect ---
+SWWW_EFFECTS=""
+case "$EFFECT_SETTING" in
+    1) SWWW_EFFECTS="--transition-type simple --transition-duration 1" ;;
+    2) SWWW_EFFECTS="--transition-type wipe --transition-angle 30 --transition-step 90" ;;
+    3) SWWW_EFFECTS="--transition-type grow --transition-pos center --transition-step 120" ;;
+    4) SWWW_EFFECTS="--transition-type outer --transition-step 90" ;;
+    5) SWWW_EFFECTS="--transition-type fade --transition-duration 2" ;;
+    6) SWWW_EFFECTS="--transition-type left --transition-duration 1" ;;
+    7) SWWW_EFFECTS="--transition-type right --transition-duration 1" ;;
+    8) SWWW_EFFECTS="--transition-type bottom --transition-duration 1" ;;
+    9) SWWW_EFFECTS="--transition-type top --transition-duration 1" ;;
+    10) SWWW_EFFECTS="--transition-type wipe --transition-angle 45 --transition-duration 1.2" ;;
+    11) SWWW_EFFECTS="--transition-type wave --transition-angle 0 --transition-duration 1.5" ;;
+    12) SWWW_EFFECTS="--transition-type any --transition-duration 1" ;;
+    13) SWWW_EFFECTS="" ;;
+    14) SWWW_EFFECTS="--transition-type fade --transition-duration 5" ;;
+    15) SWWW_EFFECTS="--transition-type wave --transition-duration 4" ;;
+    16) SWWW_EFFECTS="--transition-type grow --transition-pos center --transition-duration 3" ;;
+    17) SWWW_EFFECTS="--transition-type wipe --transition-angle 90 --transition-duration 2" ;;
+    18) SWWW_EFFECTS="--transition-type wipe --transition-angle 0 --transition-duration 2" ;;
+    *) SWWW_EFFECTS="$EFFECT_SETTING" ;;
+esac
+
+# --- Main Multi-Monitor Logic ---
+SWWW_CMD_PARTS=()
+
+AWK_SCRIPT='
+BEGIN { srand() }
+$5 ~ path_re {
+    ar_diff = mar - $3;
+    if (ar_diff < 0) { ar_diff = -ar_diff; }
+    ar_weight = 1 / (ar_diff + 0.01);
+    image_pixels = $4;
+    if (image_pixels >= m_pixels) {
+        res_weight = 1.0;
+    } else {
+        res_weight = image_pixels / m_pixels;
+    }
+    final_weight = ar_weight * res_weight;
+    lines[NR] = $0;
+    weights[NR] = final_weight;
+    total_weight += final_weight;
+}
+END {
+    if (total_weight > 0) {
+        rand_num = rand() * total_weight;
+        for (i in lines) {
+            rand_num -= weights[i];
+            if (rand_num <= 0) {
+                print lines[i];
+                exit;
+            }
+        }
+    }
+}'
+
+while read -r name width height; do
+    echo "🖥️  Processing monitor: $name (${width}x${height})"
+    MONITOR_AR=$(echo "scale=4; $width / $height" | bc)
+    MONITOR_PIXELS=$((width * height))
+    SELECTED_LINE=$(awk \
+        -v mar="$MONITOR_AR" -v m_pixels="$MONITOR_PIXELS" \
+        -v path_re="\"$WALL_PATH" \
+        "$AWK_SCRIPT" "$MANIFEST_FILE")
+    
+    if [[ -n "$SELECTED_LINE" ]]; then
+        IMAGE=$(echo "$SELECTED_LINE" | cut -d'"' -f2)
+        WALLPAPER_AR=$(echo "$SELECTED_LINE" | cut -d' ' -f3)
+        WALLPAPER_PIXELS=$(echo "$SELECTED_LINE" | cut -d' ' -f4)
+        AR_DIFF=$(echo "d = $MONITOR_AR - $WALLPAPER_AR; if (d < 0) d = -d; d" | bc)
+        
+        echo "    🖼️  Found image: $(basename "$IMAGE")"
+        echo "        📏 Aspect Ratio Difference: $AR_DIFF (closer to 0 is better)"
+        echo "        🔎 Resolution: ${WALLPAPER_PIXELS} vs ${MONITOR_PIXELS} (Monitor)"
+        SWWW_CMD_PARTS+=(-o "$name" "$IMAGE")
+    else
+        echo "    ⚠️  Warning: No suitable wallpaper found for monitor $name in path '$WALL_PATH'."
+    fi
+done < <(swaymsg -t get_outputs | jq -r '.[] | select(.active == true and .current_mode != null) | "\(.name) \(.current_mode.width) \(.current_mode.height)"')
+
+# --- Execute Final Command ---
+if [ ${#SWWW_CMD_PARTS[@]} -eq 0 ]; then
+    echo "❌ Error: No suitable wallpapers could be found for any active monitors."
+    exit 1
+fi
+
+echo "🚀 Setting wallpapers for all monitors..."
+# The --scaling option has been removed from this line to support older swww versions
+swww img "${SWWW_CMD_PARTS[@]}" $SWWW_EFFECTS --resize fit

@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# ~/.local/bin/hwall-select
+
+CONFIG_FILE="$HOME/.config/hwall/config"
+START_DIR="$1"
+
+# Default to home directory if no argument provided
+if [[ -z "$START_DIR" ]]; then
+    START_DIR="$HOME/Wallpapers"
+fi
+
+# Function to update path in config
+update_config_path() {
+    local new_path="$1"
+    if grep -q '^path=' "$CONFIG_FILE"; then
+        sed -i "s|^path=.*|path=$new_path|" "$CONFIG_FILE"
+    else
+        echo "path=$new_path" >> "$CONFIG_FILE"
+    fi
+    echo "Wallpaper path updated to: $new_path"
+}
+
+# Recursive selection function
+select_directory() {
+    local current_dir="$1"
+
+    # Find subdirectories (excluding hidden and the current directory itself)
+    mapfile -t subdirs < <(find "$current_dir" -mindepth 1 -maxdepth 1 -type d -not -name ".*" | sort)
+
+    # If no subdirectories, auto-select current directory
+    if [[ ${#subdirs[@]} -eq 0 ]]; then
+        update_config_path "$current_dir"
+        return
+    fi
+
+    # Create the rofi list
+    local options=("[Use This Directory] $current_dir")
+    for dir in "${subdirs[@]}"; do
+        options+=("$dir")
+    done
+
+    # Display with rofi
+    local choice=$(printf "%s\n" "${options[@]}" | rofi -dmenu -p "Select Directory: " -config ~/.config/rofi/rose-pine.rasi)
+
+    # Handle user selection
+    if [[ -z "$choice" ]]; then
+        echo "No selection made. Exiting."
+        exit 1
+    elif [[ "$choice" == "[Use This Directory] $current_dir" ]]; then
+        update_config_path "$current_dir"
+    else
+        select_directory "$choice"
+    fi
+}
+
+# Start the directory selection
+select_directory "$START_DIR"

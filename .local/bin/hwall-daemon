@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# ~/.local/bin/hwall-daemon
+
+# Path to your wallpaper script and config file
+WALLPAPER_SCRIPT="$HOME/.local/bin/hwall"
+CONFIG_FILE="$HOME/.config/hwall/config"
+
+# Check if the script exists
+if [[ ! -x "$WALLPAPER_SCRIPT" ]];
+then
+    echo "Wallpaper script not found or not executable at $WALLPAPER_SCRIPT"
+    exit 1
+fi
+
+# Infinite loop
+while true; do
+    # Run the wallpaper setter script.
+    # It reads its own config, so path/effect changes are applied here.
+    "$WALLPAPER_SCRIPT"
+
+    # Re-read interval from config each loop, with a default of 120 seconds
+    if [[ -f "$CONFIG_FILE" ]]; then
+        INTERVAL=$(grep '^interval=' "$CONFIG_FILE" | cut -d'=' -f2-)
+    fi
+    # If INTERVAL is not set or is empty, default to 120
+    : "${INTERVAL:=120}"
+
+    # Sleep for the configured (or default) duration
+    sleep "$INTERVAL"
+done
