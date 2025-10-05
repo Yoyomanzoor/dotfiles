@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ~/.local/bin/hwall (v7.2 - Legacy swww compatible)
+# ~/.local/bin/hwall (v8 - Configurable Scaling)
 
 # --- Configuration ---
 CONFIG_FILE="$HOME/.config/hwall/config"
@@ -18,6 +18,8 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
 fi
 WALL_PATH=$(grep '^path=' "$CONFIG_FILE" | cut -d'=' -f2-)
 EFFECT_SETTING=$(grep '^effect=' "$CONFIG_FILE" | cut -d'=' -f2-)
+SCALING_MODE=$(grep '^scaling=' "$CONFIG_FILE" | cut -d'=' -f2-)
+
 if [[ -z "$WALL_PATH" || ! -d "$WALL_PATH" ]]; then
     echo "Error: Invalid or missing path in config: '$WALL_PATH'"
     exit 1
@@ -58,7 +60,6 @@ esac
 
 # --- Main Multi-Monitor Logic ---
 SWWW_CMD_PARTS=()
-
 AWK_SCRIPT='
 BEGIN { srand() }
 $5 ~ path_re {
@@ -119,6 +120,12 @@ if [ ${#SWWW_CMD_PARTS[@]} -eq 0 ]; then
     exit 1
 fi
 
+# NEW: Prepare the scaling flag based on the config setting.
+SCALING_FLAG=""
+if [[ "$SCALING_MODE" == "fit" ]]; then
+    SCALING_FLAG="--resize fit"
+fi
+
 echo "🚀 Setting wallpapers for all monitors..."
-# The --scaling option has been removed from this line to support older swww versions
-swww img "${SWWW_CMD_PARTS[@]}" $SWWW_EFFECTS --resize fit
+# The $SCALING_FLAG variable is added to the command.
+swww img $SCALING_FLAG "${SWWW_CMD_PARTS[@]}" $SWWW_EFFECTS

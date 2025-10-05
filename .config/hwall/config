@@ -2,3 +2,5 @@
 path=/home/yoyomanzoor/Wallpapers/nature
 interval=180
 effect=18
+# set scaling to fit to screen
+# scaling=fit
