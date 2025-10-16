@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ~/.local/bin/hwall (v8 - Configurable Scaling)
+# ~/.local/bin/hwall (v9 - Separate Monitor Commands)
 
 # --- Configuration ---
 CONFIG_FILE="$HOME/.config/hwall/config"
@@ -59,7 +59,6 @@ case "$EFFECT_SETTING" in
 esac
 
 # --- Main Multi-Monitor Logic ---
-SWWW_CMD_PARTS=()
 AWK_SCRIPT='
 BEGIN { srand() }
 $5 ~ path_re {
@@ -90,6 +89,16 @@ END {
     }
 }'
 
+# --- Prepare scaling flag ---
+SCALING_FLAG=""
+if [[ "$SCALING_MODE" == "fit" ]]; then
+    SCALING_FLAG="--scaling fit"
+fi
+
+# --- Loop and Execute ---
+SUCCESSFUL_SETS=0
+echo "🚀 Setting wallpapers for all monitors..."
+
 while read -r name width height; do
     echo "🖥️  Processing monitor: $name (${width}x${height})"
     MONITOR_AR=$(echo "scale=4; $width / $height" | bc)
@@ -108,24 +117,17 @@ while read -r name width height; do
         echo "    🖼️  Found image: $(basename "$IMAGE")"
         echo "        📏 Aspect Ratio Difference: $AR_DIFF (closer to 0 is better)"
         echo "        🔎 Resolution: ${WALLPAPER_PIXELS} vs ${MONITOR_PIXELS} (Monitor)"
-        SWWW_CMD_PARTS+=(-o "$name" "$IMAGE")
+
+        # **THE FIX IS HERE**: Execute swww for each monitor inside the loop.
+        swww img "$IMAGE" -o "$name" $SCALING_FLAG $SWWW_EFFECTS
+        SUCCESSFUL_SETS=$((SUCCESSFUL_SETS + 1))
     else
         echo "    ⚠️  Warning: No suitable wallpaper found for monitor $name in path '$WALL_PATH'."
     fi
 done < <(swaymsg -t get_outputs | jq -r '.[] | select(.active == true and .current_mode != null) | "\(.name) \(.current_mode.width) \(.current_mode.height)"')
 
-# --- Execute Final Command ---
-if [ ${#SWWW_CMD_PARTS[@]} -eq 0 ]; then
+# --- Final Check ---
+if [ "$SUCCESSFUL_SETS" -eq 0 ]; then
     echo "❌ Error: No suitable wallpapers could be found for any active monitors."
     exit 1
 fi
-
-# NEW: Prepare the scaling flag based on the config setting.
-SCALING_FLAG=""
-if [[ "$SCALING_MODE" == "fit" ]]; then
-    SCALING_FLAG="--resize fit"
-fi
-
-echo "🚀 Setting wallpapers for all monitors..."
-# The $SCALING_FLAG variable is added to the command.
-swww img $SCALING_FLAG "${SWWW_CMD_PARTS[@]}" $SWWW_EFFECTS
