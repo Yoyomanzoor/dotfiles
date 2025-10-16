@@ -9,10 +9,10 @@ image/png=vimiv.desktop;
 image/svg=vimiv.desktop;
 image/tiff=vimiv.desktop;
 image/webp=vimiv.desktop;
-text/html=vieb.desktop;
-application/xhtml+xml=vieb.desktop;
-x-scheme-handler/http=vieb.desktop;
-x-scheme-handler/https=vieb.desktop;
+text/html=firefox.desktop;
+application/xhtml+xml=firefox.desktop;
+x-scheme-handler/http=firefox.desktop;
+x-scheme-handler/https=firefox.desktop;
 
 [Default Applications]
 application/msword=libreoffice-writer.desktop
@@ -44,5 +44,8 @@ video/mpeg=mpv.desktop
 video/ogg=mpv.desktop
 video/webm=mpv.desktop
 x-scheme-handler/discord=vesktop.desktop
-x-scheme-handler/http=vieb.desktop
-x-scheme-handler/https=vieb.desktop
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
+text/html=firefox.desktop
+x-scheme-handler/about=firefox.desktop
+x-scheme-handler/unknown=firefox.desktop
