@@ -2,72 +2,137 @@
 # ~/.local/bin/hwall-mode
 
 # --- Configuration ---
-# This is the configuration file that will be updated.
 CONFIG_FILE="$HOME/.config/hwall/config"
+ROFI_CMD="rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi"
 
-# --- Define Effects ---
-# These effects correspond to the case statement in the main 'hwall' script.
-# The format is "number: User-friendly description".
-effects=(
-    "1: Simple"
-    "2: Wipe (Angle 30)"
-    "3: Grow (Center)"
-    "4: Outer"
-    "5: Fade (2s)"
-    "6: Left"
-    "7: Right"
-    "8: Bottom"
-    "9: Top"
-    "10: Wipe (Angle 45, 1.2s)"
-    "11: Wave (1.5s)"
-    "12: Any"
-    "13: None (Instant)"
-    "14: Fade (5s, Slow)"
-    "15: Wave (4s, Slow)"
-    "16: Grow (Center, 3s, Slow)"
-    "17: Wipe (Angle 90, 2s)"
-    "18: Wipe (Angle 0, 2s)"
-)
+# --- Helper Functions ---
 
-# --- Rofi Menu ---
-# Convert the bash array into a newline-separated string for rofi.
-options=$(printf "%s\n" "${effects[@]}")
-
-# Get the current effect to highlight it in rofi.
-current_effect_num=$(grep '^effect=' "$CONFIG_FILE" | cut -d'=' -f2-)
-current_line_num=$((current_effect_num - 1))
-
-# Display the rofi menu and capture the user's choice.
-# The -a flag specifies the active row (the currently selected effect).
-choice=$(echo -e "$options" | rofi -dmenu -p "Select Effect" -a "$current_line_num" -config ~/.config/rofi/rose-pine.rasi)
-
-# --- Update Config File ---
-if [[ -n "$choice" ]]; then
-    # Extract the number from the beginning of the selected string (e.g., "1: Simple" -> "1").
-    effect_number=$(echo "$choice" | cut -d':' -f1)
-
-    # Ensure the config file exists before trying to write to it.
+# Ensures that the config file and its directory exist.
+ensure_config_exists() {
     if [[ ! -f "$CONFIG_FILE" ]]; then
         echo "Creating config file at $CONFIG_FILE"
         mkdir -p "$(dirname "$CONFIG_FILE")"
-        # Add a default path if creating the file for the first time
+        # Add some default values
         echo "path=$HOME/Wallpapers" > "$CONFIG_FILE"
+        echo "effect=1" >> "$CONFIG_FILE"
     fi
+}
 
-    # Check if an 'effect=' line already exists in the config.
-    if grep -q '^effect=' "$CONFIG_FILE"; then
-        # If it exists, replace the line with the new value.
-        sed -i "s|^effect=.*|effect=$effect_number|" "$CONFIG_FILE"
+# Updates a specific key-value pair in the config file.
+update_config() {
+    local key="$1"
+    local value="$2"
+    ensure_config_exists
+    if grep -q "^$key=" "$CONFIG_FILE"; then
+        sed -i "s|^$key=.*|$key=$value|" "$CONFIG_FILE"
     else
-        # If it does not exist, append the new line to the file.
-        echo "effect=$effect_number" >> "$CONFIG_FILE"
+        echo "$key=$value" >> "$CONFIG_FILE"
     fi
+}
 
-    echo "✅ Wallpaper effect updated to: $choice"
-    # Optional: uncomment the line below to automatically apply a new wallpaper with the new effect.
-    # hwall
-else
-    echo "No selection made. Exiting."
-    exit 1
-fi
+# --- Sub-Menus ---
+
+select_effect() {
+    local effects=(
+        "1: Simple"
+        "2: Wipe (Angle 30)"
+        "3: Grow (Center)"
+        "4: Outer"
+        "5: Fade (2s)"
+        "6: Left"
+        "7: Right"
+        "8: Bottom"
+        "9: Top"
+        "10: Wipe (Angle 45, 1.2s)"
+        "11: Wave (1.5s)"
+        "12: Any"
+        "13: None (Instant)"
+        "14: Fade (5s, Slow)"
+        "15: Wave (4s, Slow)"
+        "16: Grow (Center, 3s, Slow)"
+        "17: Wipe (Angle 90, 2s)"
+        "18: Wipe (Angle 0, 2s)"
+    )
+    local options=$(printf "%s\n" "${effects[@]}")
+    local current_effect_num=$(grep '^effect=' "$CONFIG_FILE" | cut -d'=' -f2- 2>/dev/null || echo 1)
+    local current_line_num=$((current_effect_num - 1))
+    
+    local choice=$(echo -e "$options" | $ROFI_CMD -p "Effect" -a "$current_line_num")
+
+    if [[ -n "$choice" ]]; then
+        local effect_number=$(echo "$choice" | cut -d':' -f1)
+        update_config "effect" "$effect_number"
+        echo "✅ Wallpaper effect updated to: $choice"
+    fi
+}
+
+select_scaling() {
+    local options=("Fit" "No Fit (Default)")
+    local choice=$(printf "%s\n" "${options[@]}" | $ROFI_CMD -p "Scaling")
+
+    if [[ -n "$choice" ]]; then
+        ensure_config_exists
+        if [[ "$choice" == "Fit" ]]; then
+            update_config "scaling" "fit"
+            echo "✅ Scaling mode set to: Fit"
+        else
+            # Removes the scaling line from the config file
+            sed -i "/^scaling=/d" "$CONFIG_FILE"
+            echo "✅ Scaling mode set to default (removed from config)."
+        fi
+    fi
+}
+
+select_interval() {
+    local intervals=(
+        "30 seconds:30"
+        "1 minute:60"
+        "2 minutes:120"
+        "3 minutes:180"
+        "5 minutes:300"
+        "10 minutes:600"
+    )
+    local options=$(printf "%s\n" "${intervals[@]}" | cut -d':' -f1)
+    local choice=$(echo -e "$options" | $ROFI_CMD -p "Interval")
+
+    if [[ -n "$choice" ]]; then
+        # Find the corresponding seconds value for the chosen friendly name
+        for item in "${intervals[@]}"; do
+            if [[ "$(echo "$item" | cut -d':' -f1)" == "$choice" ]]; then
+                local interval_seconds=$(echo "$item" | cut -d':' -f2)
+                update_config "interval" "$interval_seconds"
+                echo "✅ Wallpaper interval updated to: $choice"
+                break
+            fi
+        done
+    fi
+}
+
+# --- Main Menu ---
+main() {
+    ensure_config_exists
+    local main_options=("1. Wallpaper Folder" "2. Effect" "3. Scaling" "4. Interval")
+    local choice=$(printf "%s\n" "${main_options[@]}" | $ROFI_CMD -p "hwall Config")
+
+    case "$choice" in
+        "1. Wallpaper Folder")
+            hwall-select
+            ;;
+        "2. Effect")
+            select_effect
+            ;;
+        "3. Scaling")
+            select_scaling
+            ;;
+        "4. Interval")
+            select_interval
+            ;;
+        *)
+            echo "No selection made. Exiting."
+            exit 0
+            ;;
+    esac
+}
+
+main
 

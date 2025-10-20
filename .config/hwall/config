@@ -1,6 +1,6 @@
 # ~/.config/hwall/config
 path=/home/yoyomanzoor/Wallpapers
 interval=180
-effect=18
+effect=6
 # set scaling to fit to screen
 # scaling=fit
