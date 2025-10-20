@@ -334,10 +334,12 @@ bindsym $mod+i exec --no-startup-id fd --type f -e jpg -e jpeg -e png --hidden -
 bindsym $mod+m exec --no-startup-id fd --type f -e mp4 -e mov . ~ --exclude .git | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p "󱇒 " | sed "s/^/'/;s/$/'/" | ifne xargs mpv
 # bindsym $mod+P exec --no-startup-id nwg-displays
 
-## Wallpaper // Change Wallpaper // <><Shift> w / <><Alt> w ##
-bindsym $mod+Shift+w exec --no-startup-id swww img "$(fd --type f -e jpg -e jpeg -e png --exclude .git --exclude drive --full-path $HOME/Pictures | rofi -dmenu -p "Select Wallpaper: ")"
+## Wallpaper // Change Wallpaper // <><Shift> w ##
+bindsym $mod+Shift+w exec --no-startup-id swww img "$(fd --type f -e jpg -e jpeg -e png --exclude .git --exclude drive --full-path $HOME/Pictures | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p "Select Wallpaper: ")"
 ## Wallpaper // Select Wallpaper folder // <><Alt> w ##
 bindsym $mod+alt+w exec --no-startup-id hwall-select
+## Wallpaper // Change Wallpaper animation // <><Ctrl> w ##
+bindsym $mod+Ctrl+w exec --no-startup-id hwall-mode
 
 # cursor_trail 3
 mouse_warping container

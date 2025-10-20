@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# ~/.local/bin/hwall-mode
+
+# --- Configuration ---
+# This is the configuration file that will be updated.
+CONFIG_FILE="$HOME/.config/hwall/config"
+
+# --- Define Effects ---
+# These effects correspond to the case statement in the main 'hwall' script.
+# The format is "number: User-friendly description".
+effects=(
+    "1: Simple"
+    "2: Wipe (Angle 30)"
+    "3: Grow (Center)"
+    "4: Outer"
+    "5: Fade (2s)"
+    "6: Left"
+    "7: Right"
+    "8: Bottom"
+    "9: Top"
+    "10: Wipe (Angle 45, 1.2s)"
+    "11: Wave (1.5s)"
+    "12: Any"
+    "13: None (Instant)"
+    "14: Fade (5s, Slow)"
+    "15: Wave (4s, Slow)"
+    "16: Grow (Center, 3s, Slow)"
+    "17: Wipe (Angle 90, 2s)"
+    "18: Wipe (Angle 0, 2s)"
+)
+
+# --- Rofi Menu ---
+# Convert the bash array into a newline-separated string for rofi.
+options=$(printf "%s\n" "${effects[@]}")
+
+# Get the current effect to highlight it in rofi.
+current_effect_num=$(grep '^effect=' "$CONFIG_FILE" | cut -d'=' -f2-)
+current_line_num=$((current_effect_num - 1))
+
+# Display the rofi menu and capture the user's choice.
+# The -a flag specifies the active row (the currently selected effect).
+choice=$(echo -e "$options" | rofi -dmenu -p "Select Effect" -a "$current_line_num" -config ~/.config/rofi/rose-pine.rasi)
+
+# --- Update Config File ---
+if [[ -n "$choice" ]]; then
+    # Extract the number from the beginning of the selected string (e.g., "1: Simple" -> "1").
+    effect_number=$(echo "$choice" | cut -d':' -f1)
+
+    # Ensure the config file exists before trying to write to it.
+    if [[ ! -f "$CONFIG_FILE" ]]; then
+        echo "Creating config file at $CONFIG_FILE"
+        mkdir -p "$(dirname "$CONFIG_FILE")"
+        # Add a default path if creating the file for the first time
+        echo "path=$HOME/Wallpapers" > "$CONFIG_FILE"
+    fi
+
+    # Check if an 'effect=' line already exists in the config.
+    if grep -q '^effect=' "$CONFIG_FILE"; then
+        # If it exists, replace the line with the new value.
+        sed -i "s|^effect=.*|effect=$effect_number|" "$CONFIG_FILE"
+    else
+        # If it does not exist, append the new line to the file.
+        echo "effect=$effect_number" >> "$CONFIG_FILE"
+    fi
+
+    echo "✅ Wallpaper effect updated to: $choice"
+    # Optional: uncomment the line below to automatically apply a new wallpaper with the new effect.
+    # hwall
+else
+    echo "No selection made. Exiting."
+    exit 1
+fi
+
