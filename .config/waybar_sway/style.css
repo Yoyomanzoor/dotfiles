@@ -119,3 +119,9 @@ window#waybar {
 #custom-music.Stopped {
     background: #161925;
 }
+
+#custom-calendar {
+    padding: 0 5px;
+    margin: 0 3px;
+    color: #cba6f7; /* A nice mauve color, change as you like */
+}

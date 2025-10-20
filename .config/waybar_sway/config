@@ -9,7 +9,7 @@
     // "modules-left": ["sway/workspaces", "sway/mode", "custom/spotify"],
     "modules-left": ["sway/workspaces", "sway/mode"],
     "modules-center": ["sway/window"],
-    "modules-right": ["pulseaudio", "network", "cpu", "memory", "battery", "tray", "clock"],
+    "modules-right": ["pulseaudio", "network", "cpu", "memory", "battery", "tray", "custom/calendar", "clock"],
     "sway/workspaces": {
         "disable-scroll": false,
         "all-outputs": true,
@@ -104,8 +104,16 @@
         "on-scroll-down": "playerctl next",
         "on-click-right": "g4music",
         "max-length": 35
+    },
+    "custom/calendar": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "~/.config/waybar_sway/calendar.sh",
+        "on-click": "~/.config/waybar_sway/calendar.sh --onclick",
+        "interval": 60, // Refresh every 60 seconds
+        "tooltip": true
     }
-//    "custom/spotify": {
+    //    "custom/spotify": {
 //        "format": " {}",
 //        "max-length": 40,
 //        "interval": 30, // Remove this if your script is endless and write in loop
