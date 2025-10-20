@@ -5,6 +5,7 @@
     /dev/input/by-id/usb-SONiX_USB_DEVICE-event-kbd
     /dev/input/by-id/usb-OLKB_Planck_Light_0-event-kbd
     /dev/input/by-id/usb-Logitech_USB_Receiver-if01-event-kbd
+    /dev/input/by-id/usb-Primax_Dell_KB216_Wired_Keyboard-event-kb
     /dev/input/by-path/platform-i8042-serio-0-event-kbd
   )
   process-unmapped-keys yes
