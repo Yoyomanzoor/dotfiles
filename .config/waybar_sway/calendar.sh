@@ -3,37 +3,59 @@
 
 # Path to the cache file
 CACHE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/waybar/calendar.cache"
-CACHE_AGE_MINUTES=240 # 4 hours = 240 minutes
+# --- Path to the log file ---
+LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/waybar/calendar.log"
+# Set cache age to 4 hours (240 minutes)
+CACHE_AGE_MINUTES=240
 
+# --- Logging function ---
+# Appends a timestamped message to the log file.
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+}
+
+# --- Cache update logic with logging ---
 update_cache() {
     # Ensure the cache directory exists
     mkdir -p "$(dirname "$CACHE_FILE")"
-    
+
     local needs_update=false
-    # Check if cache needs updating (doesn't exist or is older than CACHE_AGE_MINUTES)
-    if [ ! -f "$CACHE_FILE" ] || [ -n "$(find "$CACHE_FILE" -mmin +$CACHE_AGE_MINUTES)" ]; then
+    local reason=""
+    # Condition 1: Cache file doesn't exist.
+    if [ ! -f "$CACHE_FILE" ]; then
         needs_update=true
+        reason="Cache file not found."
+    # Condition 2: Cache file is older than 4 hours.
+    elif [ -n "$(find "$CACHE_FILE" -mmin +$CACHE_AGE_MINUTES 2>/dev/null)" ]; then
+        needs_update=true
+        reason="Cache is older than ${CACHE_AGE_MINUTES} minutes."
+    # Condition 3: The cache file itself contains the connection error from a past failure.
+    elif grep -q "Unable to find the Google Calendar server" "$CACHE_FILE"; then
+        needs_update=true
+        reason="Previous fetch failed with connection error."
     fi
 
     if [ "$needs_update" = true ]; then
-        # Check for internet connection with a 2-second timeout to prevent hangs.
-        if ping -c 1 -W 2 8.8.8.8 &> /dev/null; then
-            # Internet is available. Fetch calendar to a temporary file first.
-            local tmp_cache_file="/tmp/waybar-calendar.tmp"
-            gcalendar > "$tmp_cache_file"
+        log "Update triggered: $reason"
+        # Fetch new data to a temporary file to avoid corrupting the main cache on failure.
+        local tmp_cache_file
+        tmp_cache_file=$(mktemp)
 
-            # IMPORTANT: Check if the fetch was successful.
-            # If gcalendar failed, it writes an error. We don't want that in our cache.
-            if ! grep -q "Unable to find the Google Calendar server" "$tmp_cache_file"; then
-                # Success! Overwrite the old cache with the new, valid data.
-                mv "$tmp_cache_file" "$CACHE_FILE"
-            fi
-            # If the fetch failed, we do nothing, preserving the old cache data.
+        log "Making gcalendar API call."
+        gcalendar > "$tmp_cache_file"
+
+        # CRITICAL CHECK: Only overwrite the cache if the fetch was successful.
+        if ! grep -q "Unable to find the Google Calendar server" "$tmp_cache_file"; then
+            # Success! Move the new data to the permanent cache file.
+            log "API call successful. Cache updated."
+            mv "$tmp_cache_file" "$CACHE_FILE"
+        else
+            # Failure. The temp file contains an error, so we discard it, leaving the old cache untouched.
+            log "API call failed. Preserving old cache."
+            rm "$tmp_cache_file"
         fi
-        # If ping fails (no internet), we also do nothing, preserving the old cache.
     fi
 }
-
 
 # --- Function to get a time-of-day icon ---
 get_tod_icon() {
@@ -49,13 +71,14 @@ get_tod_icon() {
     fi
 }
 
-# --- Main logic to display the next event in Waybar ---
+# --- Main logic ---
 display_waybar() {
     update_cache
-    
-    # --- Handle case where cache file doesn't exist at all ---
-    if [ ! -f "$CACHE_FILE" ]; then
-        echo '{"text": "󰃭 Connecting...", "tooltip": "Waiting for internet to fetch calendar events."}'
+
+    # If the cache file still doesn't exist or contains the error (which can only happen
+    # if the very first attempt to create it failed), show a connecting message.
+    if [ ! -f "$CACHE_FILE" ] || grep -q "Unable to find the Google Calendar server" "$CACHE_FILE"; then
+        echo '{"text": "󰃭 Connecting...", "tooltip": "Fetching Google Calendar events. Will retry."}'
         exit 0
     fi
 
@@ -67,7 +90,7 @@ display_waybar() {
     while IFS= read -r line || [[ -n "$line" ]]; do
         START_DATETIME_STR=$(echo "$line" | awk '{print $1}')
         START_DATETIME_FORMATTED=$(echo "$START_DATETIME_STR" | sed 's/:/ /')
-        
+
         if ! TEMP_TS=$(date -d "$START_DATETIME_FORMATTED" +%s 2>/dev/null); then
             continue
         fi
@@ -79,19 +102,13 @@ display_waybar() {
         fi
     done < "$CACHE_FILE"
 
-    # --- Logic for when no event is found ---
+    # If no upcoming event was found in our last good cache file.
     if [ -z "$NEXT_EVENT_LINE" ]; then
-        # If no upcoming event was found, check if it's because of a connection error.
-        # This error message might be in the cache from a previous failed attempt before this script was updated.
-        if grep -q "Unable to find the Google Calendar server" "$CACHE_FILE"; then
-            echo '{"text": "󰃭 Connecting...", "tooltip": "Waiting for internet connection to fetch calendar events."}'
-        else
-            # Otherwise, there are genuinely no upcoming events in our last successful fetch.
-            echo '{"text": "󰃭 No upcoming events", "tooltip": "No events for today"}'
-        fi
+        echo '{"text": "󰃭 No upcoming events", "tooltip": "No upcoming events in the last successful sync."}'
         exit 0
     fi
 
+    # --- Formatting logic for the found event ---
     DIFF_SEC=$((EVENT_TS - NOW_TS))
     if (( DIFF_SEC < 60 )); then
         TIME_UNTIL="< 1m"
@@ -190,25 +207,15 @@ show_upcoming_list() {
                 gsub(/</, "&lt;", location);
                 gsub(/>/, "&gt;", location);
 
-                # *** THE DEFINITIVE FIX ***
-                # Check if the title contains Arabic characters.
                 is_rtl = (title ~ /[\u0600-\u06FF]/);
 
                 if (is_rtl) {
-                    # For RTL titles, wrap the title in Directional Isolates.
-                    # This lets the Arabic render correctly as RTL, but contains its
-                    # directional influence so it does not affect the LTR location.
-                    # The \u202d at the start ensures the components (date, title, loc)
-                    # are ordered correctly left-to-right overall.
                     printf "\u202d%s (%s - %s) - \u2067%s\u2069", day_str, start_time_str, end_time_str, title;
                 } else {
-                    # For standard LTR titles, print normally.
                     printf "%s (%s - %s) - %s", day_str, start_time_str, end_time_str, title;
                 }
-                
+
                 if (location != "") {
-                    # A Left-to-Right Mark (\u200e) creates a strong LTR boundary
-                    # that protects the span from the preceding RTL text.
                     printf "\u200e <span size=\"small\" font_style=\"italic\" weight=\"light\">| 📍 %s</span>", location;
                 }
                 printf "\n";
