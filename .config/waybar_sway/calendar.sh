@@ -3,17 +3,37 @@
 
 # Path to the cache file
 CACHE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/waybar/calendar.cache"
+CACHE_AGE_MINUTES=240 # 4 hours = 240 minutes
 
-# --- Function to update cache if it's old or doesn't exist ---
 update_cache() {
-    # Ensure the cache directory exists before writing to it
+    # Ensure the cache directory exists
     mkdir -p "$(dirname "$CACHE_FILE")"
+    
+    local needs_update=false
+    # Check if cache needs updating (doesn't exist or is older than CACHE_AGE_MINUTES)
+    if [ ! -f "$CACHE_FILE" ] || [ -n "$(find "$CACHE_FILE" -mmin +$CACHE_AGE_MINUTES)" ]; then
+        needs_update=true
+    fi
 
-    # Update cache if it doesn't exist or is from a previous day
-    if [ ! -f "$CACHE_FILE" ] || [ "$(date -r "$CACHE_FILE" +%F)" != "$(date +%F)" ]; then
-        gcalendar > "$CACHE_FILE"
+    if [ "$needs_update" = true ]; then
+        # Check for internet connection with a 2-second timeout to prevent hangs.
+        if ping -c 1 -W 2 8.8.8.8 &> /dev/null; then
+            # Internet is available. Fetch calendar to a temporary file first.
+            local tmp_cache_file="/tmp/waybar-calendar.tmp"
+            gcalendar > "$tmp_cache_file"
+
+            # IMPORTANT: Check if the fetch was successful.
+            # If gcalendar failed, it writes an error. We don't want that in our cache.
+            if ! grep -q "Unable to find the Google Calendar server" "$tmp_cache_file"; then
+                # Success! Overwrite the old cache with the new, valid data.
+                mv "$tmp_cache_file" "$CACHE_FILE"
+            fi
+            # If the fetch failed, we do nothing, preserving the old cache data.
+        fi
+        # If ping fails (no internet), we also do nothing, preserving the old cache.
     fi
 }
+
 
 # --- Function to get a time-of-day icon ---
 get_tod_icon() {
@@ -33,6 +53,12 @@ get_tod_icon() {
 display_waybar() {
     update_cache
     
+    # --- Handle case where cache file doesn't exist at all ---
+    if [ ! -f "$CACHE_FILE" ]; then
+        echo '{"text": "󰃭 Connecting...", "tooltip": "Waiting for internet to fetch calendar events."}'
+        exit 0
+    fi
+
     NOW_TS=$(date +%s)
     NEXT_EVENT_LINE=""
     EVENT_TS=0
@@ -53,8 +79,16 @@ display_waybar() {
         fi
     done < "$CACHE_FILE"
 
+    # --- Logic for when no event is found ---
     if [ -z "$NEXT_EVENT_LINE" ]; then
-        echo '{"text": "󰃭 No upcoming events", "tooltip": "No events for today"}'
+        # If no upcoming event was found, check if it's because of a connection error.
+        # This error message might be in the cache from a previous failed attempt before this script was updated.
+        if grep -q "Unable to find the Google Calendar server" "$CACHE_FILE"; then
+            echo '{"text": "󰃭 Connecting...", "tooltip": "Waiting for internet connection to fetch calendar events."}'
+        else
+            # Otherwise, there are genuinely no upcoming events in our last successful fetch.
+            echo '{"text": "󰃭 No upcoming events", "tooltip": "No events for today"}'
+        fi
         exit 0
     fi
 
