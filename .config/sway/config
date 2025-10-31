@@ -305,14 +305,14 @@ bindsym $mod+Shift+slash exec --no-startup-id swaycheatsheet.py ~/.config/sway/c
 ## Programs // Application Launcher // ##
 # set $menu tofi-run | xargs swaymsg exec --
 # bindsym $mod+space exec $menu
-bindsym $mod+a exec --no-startup-id killall rofi || rofi -show drun -show-icons -config ~/.config/rofi/rose-pine.rasi
+bindsym $mod+a exec --no-startup-id killall rofi || rofi -show drun -show-icons -config ~/.config/rofi/rose-pine.rasi -p "󰍉 "
 bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
 # set $drun tofi-drun | xargs swaymsg exec --
 # bindsym $mod+space exec $drun
 # bindsym $mod+space exec --no-startup-id killall wofi || wofi --show drun -I
 
 ## Programs // Terminal // <> Return ##
-bindsym $mod+t exec sesh list | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi | ifne xargs $term -e sesh connect
+bindsym $mod+t exec sesh list | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p " " | ifne xargs $term -e sesh connect
 bindsym $mod+Shift+Return exec --no-startup-id vieb
 bindsym $mod+Return exec $term -e sesh connect " terminal_1"
 # bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
