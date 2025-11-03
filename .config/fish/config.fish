@@ -151,6 +151,16 @@ bind -M insert \cn 'nvim'
 bind -M insert \cy 'y'
 bind -M insert \ca 'taskwarrior-tui'
 
+# projectdo: install projectdo to use
+# abbr -a b --function projectdo_build
+# abbr -a r --function projectdo_run
+# abbr -a e --function projectdo_test
+# abbr -a p --function projectdo_tool
+alias e='projectdo test'
+alias r='projectdo run'
+alias b='projectdo build'
+alias p='projectdo tool'
+
 function check_git
    if git rev-parse --is-inside-work-tree > /dev/null 2>&1
       lazygit
