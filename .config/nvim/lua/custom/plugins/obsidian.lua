@@ -23,6 +23,26 @@ return {
 				name = "MedSchool",
 				path = "~/Documents/MedSchool",
 			},
+			{
+				name = "WelchLab",
+				path = "~/Documents/MedSchool/school/welch",
+				-- 'strict = true' tells the plugin to treat this
+				-- specific folder as the root for this context.
+				strict = true,
+				overrides = {
+					daily_notes = {
+						-- This places the note in the root of the
+						-- 'path' defined above (i.e., in 'school/welch/').
+						folder = ".",
+						date_format = "%Y-%m-%d", -- Uses your existing format
+						-- This adds the specific tag you wanted.
+						default_tags = { "welch-lab" },
+					},
+					-- This ensures new notes (like our daily)
+					-- are created relative to this workspace's path.
+					new_notes_location = "current_dir",
+				},
+			},
 		},
 		-- Optional, if you keep notes in a specific subdirectory of your vault.
 		notes_subdir = "notes",
@@ -76,6 +96,19 @@ return {
 				end,
 				opts = { buffer = true, expr = true },
 			},
+			["<leader>ow"] = {
+				action = function()
+					-- 1. Switch to the WelchLab workspace
+					vim.cmd("ObsidianWorkspace WelchLab")
+
+					-- 2. Create the note using that workspace's settings
+					vim.cmd("ObsidianToday")
+
+					-- The plugin will auto-switch back to "MedSchool"
+					-- when you navigate to a file in that vault.
+				end,
+				opts = { noremap = true, silent = true },
+			},
 		},
 
 		-- Where to put new notes. Valid options are
@@ -119,7 +152,7 @@ return {
 		---@param url string
 		follow_url_func = function(url)
 			-- Open the URL in the default web browser.
-			vim.fn.jobstart({ "open", url }) -- Mac OS
+			-- vim.fn.jobstart({ "open", url }) -- Mac OS
 			vim.fn.jobstart({ "xdg-open", url }) -- linux
 			-- vim.ui.open(url) -- need Neovim 0.10.0+
 		end,
