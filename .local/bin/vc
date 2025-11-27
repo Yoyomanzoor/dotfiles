@@ -14,6 +14,7 @@
 #   This script expects that your username and password secrets have been stored using secret-tool:
 #   secret-tool store --label="UNIQNAME" service uniqname
 #   secret-tool store --label="UM login" service umlogin
+#   secret-tool store --label="user" service user
 
 # Procedure to retrieve a secret from secret-tool
 # Arguments:
@@ -127,7 +128,7 @@ proc print_usage {script_path} {
     puts ""
     puts "Prerequisites:"
     puts "  - UM VPN client, openssh, scp, expect, libsecret, gnome-keyring, tigervnc."
-    puts "  - Secrets stored using secret-tool for 'uniqname' and 'umlogin'."
+    puts "  - Secrets stored using secret-tool for 'user,' 'uniqname' and 'umlogin'."
 }
 
 
@@ -149,13 +150,17 @@ if {[string equal $command "-h"] || [string equal $command "--help"]} {
 # Retrieve secrets using the helper procedure.
 set username [get_secret "uniqname" "UNIQNAME"]
 set password [get_secret "umlogin" "UM login"]
+set user [get_secret "user" "user"]
 
 # Use a switch statement to execute code based on the command
 switch -- $command {
     "-vc" {
         # VPN Connect Command
         puts "Attempting VPN connection..."
-        spawn /opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu/umvpn-split-tunnel-alt
+        spawn sudo openconnect umvpn.umnet.umich.edu/umvpn-all-traffic-alt --useragent=AnyConnect
+
+        expect "password for*"
+        send "$user\r"
 
         expect "Username:"
         send "$username\r"
