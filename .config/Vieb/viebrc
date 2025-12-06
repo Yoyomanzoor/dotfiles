@@ -8,7 +8,7 @@ set darkreaderblocklist+=localhost
 set darkreaderblocklist+=pubmed.ncbi.nlm.nih
 set guinavbar=oninput
 set guitabbar=onupdate
-set followchars=qwertyhome
+set followchars=custom:sdfjklgh
 
 set adblocker=update
 
