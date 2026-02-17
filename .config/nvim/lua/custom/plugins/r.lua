@@ -5,7 +5,8 @@ return {
 		lazy = false,
 		config = function()
 			require("r").setup({
-				pipe_keymap = "",
+				-- pipe_keymap = "",
+				disable_cmds = { "RInsertPipe" },
 				R_app = "radian",
 			})
 		end,
