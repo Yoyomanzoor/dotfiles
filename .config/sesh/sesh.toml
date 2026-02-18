@@ -2,108 +2,108 @@
 preview_command = "eza --all --git --icons --color=always {}"
 
 [[session]]
-name = " terminal"
+name = "t"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
 
 [[session]]
-name = " terminal_1"
+name = "t1"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
 
 [[session]]
-name = " terminal_2"
+name = "t2"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
 
 [[session]]
-name = " terminal_3"
+name = "t3"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
 
 [[session]]
-name = " terminal_4"
+name = "t4"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
 
 [[session]]
-name = " terminal_5"
+name = "t5"
 path = "~"
 startup_command = "fastfetch"
 preview_command = "fastfetch"
 
 [[session]]
-name = " yazi"
+name = "yazi"
 path = "~"
 startup_command = "y"
 
 [[session]]
-name = " nvim"
+name = "nvim"
 path = "~"
 startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='bat {}' | xargs nvim"
 preview_command = "cat ~/.config/sesh/neovim-logo.txt"
 
 [[session]]
-name = "󱀂 news"
+name = "news"
 path = "~"
 startup_command = "nboat"
 preview_command = "newsboat -x print-unread"
 
 [[session]]
-name = " downloads"
+name = "downloads"
 path = "~/Downloads"
 startup_command = "ls; y"
 
 [[session]]
-name = " music"
+name = "music"
 path = "~/Music"
 startup_command = "ls"
 
 [[session]]
-name = " nvim_config"
+name = "nvim_config"
 path = "~/.config/nvim"
 startup_command = "nvim"
 preview_command = "bat --color=always ~/.config/nvim/init.lua"
 
 [[session]]
-name = " tmux"
+name = "tmux"
 path = "~/.config/tmux"
 startup_command = "nvim tmux.conf"
 preview_command = "bat --color=always ~/.config/tmux/tmux.conf"
 
 [[session]]
-name = "󱂬 sesh"
+name = "sesh"
 path = "~/.config/sesh"
 startup_command = "nvim sesh.toml"
 preview_command = "bat --color=always ~/.config/sesh/sesh.toml"
 
 [[session]]
-name = "󰔎 hyde"
+name = "hyde"
 path = "~/.config/hyde"
 startup_command = "y"
 
 [[session]]
-name = " hyprland"
+name = "hyprland"
 path = "~/.config/hypr"
 startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='bat {}' | xargs nvim"
 
 [[session]]
-name = "󰇘 dotfiles"
+name = "dotfiles"
 path = "~/.cache/dotfiles"
 
 [[session]]
-name = " medical_school"
+name = "medical_school"
 path = "~/Documents/MedSchool"
 startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='bat {}' | xargs nvim"
 preview_command = "bat --color=always ~/Documents/MedSchool/README.md"
 
 [[session]]
-name = " cpp"
+name = "cpp"
 path = "~/Documents/cpp/learning-cpp"
 preview_command = "eza --tree --git --icons --color=always {}"
 startup_command = "fd --type f --hidden --exclude .git | fzf-tmux -p --reverse --preview='bat {}' | xargs nvim"
