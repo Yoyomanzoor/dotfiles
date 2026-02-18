@@ -314,7 +314,7 @@ bindsym $mod+d exec --no-startup-id killall wmenu-run || wmenu-run
 ## Programs // Terminal // <> Return ##
 bindsym $mod+t exec sesh list | rofi -dmenu -case-smart -config ~/.config/rofi/rose-pine.rasi -p " " | ifne xargs $term -e sesh connect
 bindsym $mod+Shift+Return exec --no-startup-id vieb
-bindsym $mod+Return exec $term -e sesh connect " terminal_1"
+bindsym $mod+Return exec $term -e sesh connect "t1"
 # bindsym $mod+t exec sesh list | tofi | ifne xargs $term -e sesh connect
 
 ## Programs // Emoji Picker // <> . ##
