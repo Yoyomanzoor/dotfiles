@@ -9,6 +9,7 @@ data.location=~/.local/share/task
 hooks.location=~/.config/task/hooks
 
 # Color theme (uncomment one to use)
+include rose-pine-256.theme
 #include light-16.theme
 #include light-256.theme
 #include bubblegum-256.theme
@@ -24,3 +25,7 @@ hooks.location=~/.config/task/hooks
 #include solarized-dark-256.theme
 #include solarized-light-256.theme
 #include no-color.theme
+context.lab.read=+dry or +wet or +lab
+context.desk.read=+dry or +admin
+context.bench.read=+wet
+context.school.read=+homework
