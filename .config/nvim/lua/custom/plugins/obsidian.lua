@@ -24,6 +24,19 @@ return {
 				path = "~/Documents/MedSchool",
 			},
 			{
+				name = "WelchLabNotebook",
+				path = "~/Documents/Welch-Lab-Notebook/",
+				strict = true,
+				overrides = {
+					daily_notes = {
+						folder = "notebook/",
+						date_format = "%Y-%m-%d",
+						default_tags = { "welch-lab" },
+					},
+					new_notes_location = "current_dir",
+				},
+			},
+			{
 				name = "WelchLab",
 				path = "~/Documents/MedSchool/school/welch",
 				-- 'strict = true' tells the plugin to treat this
