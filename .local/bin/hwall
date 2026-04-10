@@ -119,7 +119,7 @@ while read -r name width height; do
         echo "        🔎 Resolution: ${WALLPAPER_PIXELS} vs ${MONITOR_PIXELS} (Monitor)"
 
         # **THE FIX IS HERE**: Execute swww for each monitor inside the loop.
-        swww img "$IMAGE" -o "$name" $SCALING_FLAG $SWWW_EFFECTS
+        awww img "$IMAGE" -o "$name" $SCALING_FLAG $SWWW_EFFECTS
         SUCCESSFUL_SETS=$((SUCCESSFUL_SETS + 1))
     else
         echo "    ⚠️  Warning: No suitable wallpaper found for monitor $name in path '$WALL_PATH'."
