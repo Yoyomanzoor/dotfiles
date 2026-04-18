@@ -18,8 +18,8 @@ set selection-clipboard clipboard
 
 # mappings
 
-map j feedkeys "<C-Down>"
-map k feedkeys "<C-Up>"
+# map j feedkeys "<C-Down>"
+# map k feedkeys "<C-Up>"
 map <S-q> quit
 
 # unmap f
