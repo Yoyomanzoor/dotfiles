@@ -157,7 +157,9 @@ switch -- $command {
     "-vc" {
         # VPN Connect Command
         puts "Attempting VPN connection..."
-        spawn sudo openconnect umvpn.umnet.umich.edu/umvpn-all-traffic-alt --useragent=AnyConnect
+        
+        # Added --background so openconnect daemonizes after authenticating
+        spawn sudo openconnect umvpn.umnet.umich.edu/umvpn-all-traffic-alt --useragent=AnyConnect --disable-ipv6 --background
 
         expect "password for*"
         send "$user\r"
@@ -168,7 +170,16 @@ switch -- $command {
         expect "Password:"
         send "$password\r"
 
-        interact
+        # Wait for the "Configured as..." message to confirm the background process is running
+        expect {
+            "Configured as*" {
+                puts "\n>>> VPN connected and backgrounded. Returning to terminal."
+            }
+            timeout {
+                puts "\n>>> Error: Timed out waiting for VPN connection to establish."
+                exit 1
+            }
+        }
     }
 
     "-vd" {
