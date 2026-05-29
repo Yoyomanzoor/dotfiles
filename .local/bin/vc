@@ -185,8 +185,15 @@ switch -- $command {
     "-vd" {
         # VPN Disconnect Command
         puts "Attempting VPN disconnection..."
-        spawn /opt/cisco/secureclient/bin/vpn disconnect
+        
+        # Gracefully kill the openconnect process to restore normal routing
+        spawn sudo pkill -SIGINT openconnect
+
+        expect "password for*"
+        send "$user\r"
+        
         expect eof
+        puts "VPN disconnected."
     }
 
     "-s" {
