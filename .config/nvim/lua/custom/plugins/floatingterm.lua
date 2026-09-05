@@ -92,7 +92,7 @@ return {
 
 			local Terminal = require("toggleterm.terminal").Terminal
 			local ipython = Terminal:new({
-				cmd = "ipython --no-autoindent",
+				cmd = "ipython --no-autoindent --matplotlib",
 				display_name = "ipython",
 				direction = "vertical",
 				close_on_exit = true,
