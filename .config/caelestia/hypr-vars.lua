@@ -40,7 +40,10 @@ for dir, key in pairs(key_map) do
 	create_bind("SUPER + " .. key, hl.dsp.focus({ direction = dir }))
 	create_bind("SUPER + SHIFT + " .. key, hl.dsp.window.move({ direction = dir }))
 end
+
 return {
+	terminal = "kitty",
+	kbCloseWindow = "SUPER + SHIFT + Q",
 	kbLock = "SUPER + ALT + L",
 	kbShowPanels = "SUPER + ALT + K",
 	kbTerminal = "SUPER + Return",
