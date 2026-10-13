@@ -103,6 +103,10 @@ alias vpn_connect '/opt/cisco/secureclient/bin/vpn connect umvpn.umnet.umich.edu
 alias vpn_disconnect '/opt/cisco/secureclient/bin/vpn disconnect'
 # alias vd '/opt/cisco/secureclient/bin/vpn disconnect'
 
+if type -q secret-tool
+    set -gx WANDB_API_KEY (secret-tool lookup service wandb)
+end
+
 # alias home '/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
 
 # Get the error messages from journalctl
