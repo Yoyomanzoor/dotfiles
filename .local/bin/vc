@@ -1,25 +1,21 @@
 #!/usr/bin/expect --
 
-# This script handles various commands for managing connections and file transfers
-# with the University of Michigan's Great Lakes cluster.
+# This script handles VPN, SSH, SCP, and VNC tunnel workflows for the
+# University of Michigan Great Lakes cluster.
 #
-# For detailed usage information, run:
-#   vc --help
-#
-# Dependencies:
-#   - UM VPN (https://documentation.its.umich.edu/vpn/vpn-linux-vpn-instructions)
-#   - Linux (AUR): openssh, scp, expect, libsecret, gnome-keyring, tigervnc (for vncviewer)
-#
-# Setup:
-#   This script expects that your username and password secrets have been stored using secret-tool:
+# Secrets expected in secret-tool:
 #   secret-tool store --label="UNIQNAME" service uniqname
 #   secret-tool store --label="UM login" service umlogin
 #   secret-tool store --label="user" service user
+#
+# Notes:
+#   - "user" is used for sudo on your local machine.
+#   - "uniqname" and "umlogin" are used for U-M / Great Lakes auth.
+
+set timeout 120
+match_max 100000
 
 # Procedure to retrieve a secret from secret-tool
-# Arguments:
-#   service_name: The service name used when storing the secret (e.g., "uniqname", "umlogin")
-#   label: The label to display in error messages
 proc get_secret {service_name label} {
     set secret ""
     if {[catch {exec secret-tool lookup service $service_name} secret]} {
@@ -27,110 +23,195 @@ proc get_secret {service_name label} {
         puts "Please run: secret-tool store --label=\"$label\" service $service_name"
         exit 1
     }
+
+    set secret [string trim $secret]
+    if {$secret eq ""} {
+        puts "Error: Retrieved empty value for $label from secret-tool."
+        puts "Please re-store it with: secret-tool store --label=\"$label\" service $service_name"
+        exit 1
+    }
+
     return $secret
 }
 
-# Procedure to handle the SSH/SCP host key prompt
-proc handle_host_key {} {
-    expect {
-        timeout {
-            puts "\nHost key prompt not received within 1 second. Assuming already accepted or not prompted."
-        }
-        "Are you sure you want to continue connecting*" {
-            send "yes\r"
-            puts "\nAccepted host key."
-        }
-    } -timeout 1
-}
-
-# Procedure to handle the password prompt
-# Arguments:
-#   password: The password to send
-proc handle_password_prompt {password} {
-    expect {
-        timeout {
-            puts "\nError: Connection timed out while waiting for password prompt."
-            exit 1
-        }
-        "*?assword:*" {
-            send "$password\r"
-            puts "\nPassword sent."
-        }
-    }
-}
-
-# Procedure to check if an SSH tunnel already exists
-# Arguments:
-#   ssh_command: The full SSH command string used to establish the tunnel (for reference)
-#   local_port: The local port used in the SSH tunnel
-# Returns: 1 if tunnel exists, 0 otherwise
-proc check_tunnel_exists {ssh_command local_port} {
-    # We need to be more specific. Look for 'ssh', '-f', '-N', and the specific '-L local_port:'.
-    # This pattern is highly specific to background port-forwarding tunnels.
-    set search_pattern "ssh -f -N -L ${local_port}:"
-    set cmd "pgrep -f \"$search_pattern\""
-    
-    if {[catch {exec sh -c $cmd} result]} {
-        # pgrep returns non-zero exit code if no process found
-        return 1
-    } else {
-        # If result is not empty, a process was found
-        if {$result ne ""} {
-            return 0
-        } else {
-            return 1
-        }
-    }
-}
-
-# Procedure to check if vncviewer is already running with the specified local port
-# Arguments:
-#   local_port: The local port vncviewer is expected to connect to
-# Returns: 1 if vncviewer process is found, 0 otherwise
-proc check_vncviewer_exists {local_port} {
-    # Use pgrep to check for vncviewer processes connected to the specific local port
-    # The command string for vncviewer will typically be "vncviewer localhost:PORT"
-    set cmd "pgrep -f \"vncviewer localhost:$local_port\""
-    
-    if {[catch {exec sh -c $cmd} result]} {
-        # pgrep returns non-zero exit code if no process found
-        return 0
-    } else {
-        # If result is not empty, a process was found
-        if {$result ne ""} {
-            return 1
-        } else {
-            return 0
-        }
-    }
-}
-
-# Procedure to print detailed usage information
-# Arguments:
-#   script_path: The path to the script (from the global argv0 variable)
+# Print detailed usage information
 proc print_usage {script_path} {
     set script_name [file tail $script_path]
     puts "Usage: $script_name <command> \[arguments]"
     puts ""
     puts "Description:"
-    puts "  A script to manage connections and file transfers related to University of Michigan's Great Lakes cluster."
+    puts "  Manage VPN, SSH, VNC tunnels, and file transfers for U-M Great Lakes."
     puts ""
     puts "Commands:"
     puts "  -vc             Connect to the UM VPN."
     puts "  -vd             Disconnect from the UM VPN."
     puts "  -s              Open an SSH session to the Great Lakes login node."
-    puts "  -i \"ssh_cmd\"    Establish an SSH tunnel and launch a VNC viewer for an interactive session."
-    puts "                  The ssh_cmd must be enclosed in quotes and contain a local port forwarding rule."
+    puts "  -i \"ssh_cmd\"    Establish an SSH tunnel and launch a VNC viewer."
     puts "                  Example: $script_name -i \"ssh -f -N -L 22595:gl-login-node:5901 <uniqname>@greatlakes.arc-ts.umich.edu\""
-    puts "  -f              Fetch the '~/greatlakes' directory from the Great Lakes transfer node."
-    puts "  -p              Push the local '~/greatlakes' directory to the Great Lakes transfer node."
+    puts "  -f              Fetch the '~/greatlakes' directory from Great Lakes transfer node."
+    puts "  -p              Push the local '~/greatlakes' directory to Great Lakes transfer node."
     puts "  -h, --help      Display this help message."
     puts ""
     puts "Prerequisites:"
-    puts "  - UM VPN client, openssh, scp, expect, libsecret, gnome-keyring, tigervnc."
-    puts "  - Secrets stored using secret-tool for 'user,' 'uniqname' and 'umlogin'."
+    puts "  openconnect, openssh, scp, expect, libsecret/secret-tool, gnome-keyring, tigervnc."
 }
 
+# Wait for openconnect to fully daemonize. The important fix is that we do not
+# return merely on "Configured as ...". In the working terminal flow,
+# openconnect is not fully detached until "Continuing in background; pid ...".
+proc connect_vpn {sudo_password username vpn_password} {
+    set configured 0
+
+    puts "Attempting VPN connection..."
+    spawn sudo openconnect umvpn.umnet.umich.edu/umvpn-all-traffic-alt --useragent=AnyConnect --disable-ipv6 --background
+
+    expect {
+        -re {\[sudo\] password for [^:]+:} {
+            send -- "$sudo_password\r"
+            exp_continue
+        }
+        "Username:" {
+            send -- "$username\r"
+            exp_continue
+        }
+        "Password:" {
+            send -- "$vpn_password\r"
+            exp_continue
+        }
+        -re {Configured as [^\r\n]+} {
+            set configured 1
+            exp_continue
+        }
+        -re {Continuing in background; pid [0-9]+} {
+            puts "\n>>> VPN connected and backgrounded. Returning to terminal."
+            # Give routes/interfaces a brief moment to settle, but do not wait
+            # forever for EOF from the daemonized parent process.
+            expect -timeout 3 eof
+            return
+        }
+        eof {
+            if {$configured} {
+                puts "\n>>> VPN reported that it was configured, but the backgrounding line was not seen."
+                puts ">>> Check with: pgrep -a openconnect"
+                return
+            } else {
+                puts "\nError: openconnect exited before the VPN was configured."
+                exit 1
+            }
+        }
+        timeout {
+            if {$configured} {
+                puts "\nError: VPN configured, but openconnect did not finish backgrounding."
+                puts "Try disconnecting with '$::argv0 -vd' and reconnecting."
+            } else {
+                puts "\nError: Timed out before VPN connection was configured."
+            }
+            exit 1
+        }
+    }
+}
+
+# Gracefully kill openconnect. Handles both cached sudo and sudo password prompt.
+proc disconnect_vpn {sudo_password} {
+    puts "Attempting VPN disconnection..."
+    spawn sudo pkill -SIGINT openconnect
+
+    expect {
+        -re {\[sudo\] password for [^:]+:} {
+            send -- "$sudo_password\r"
+            exp_continue
+        }
+        eof {
+            puts "VPN disconnected."
+            return
+        }
+        timeout {
+            puts "\nError: Timed out while trying to disconnect VPN."
+            exit 1
+        }
+    }
+}
+
+# Shared SSH/SCP auth handler.
+# - Accepts unknown host key if prompted.
+# - Sends password when prompted.
+# - Sends a blank Okta passcode to initiate push, then gives control to you so
+#   you can read the number challenge, approve on your phone, and press Enter.
+proc authenticate_remote {password {handoff_after_okta 1}} {
+    expect {
+        "Are you sure you want to continue connecting*" {
+            send -- "yes\r"
+            puts "\nAccepted host key."
+            exp_continue
+        }
+        "*assword:*" {
+            send -- "$password\r"
+            puts "\nPassword sent."
+            exp_continue
+        }
+        "*Okta passcode*" {
+            send -- "\r"
+            puts "\n>>> Okta push initiated. Approve the number challenge, then press Enter if prompted."
+            if {$handoff_after_okta} {
+                interact
+                return "interacted"
+            } else {
+                exp_continue
+            }
+        }
+        "*passcode*" {
+            send -- "\r"
+            puts "\n>>> Okta push initiated. Approve the number challenge, then press Enter if prompted."
+            if {$handoff_after_okta} {
+                interact
+                return "interacted"
+            } else {
+                exp_continue
+            }
+        }
+        eof {
+            return "eof"
+        }
+        timeout {
+            puts "\nError: Timed out while waiting for SSH/SCP authentication prompt."
+            puts "Hints: confirm VPN is active with 'pgrep -a openconnect' and test reachability with: ssh -v <uniqname>@greatlakes.arc-ts.umich.edu"
+            exit 1
+        }
+    }
+}
+
+# Check if an SSH tunnel already exists.
+# Returns 1 if tunnel exists, 0 otherwise.
+proc check_tunnel_exists {local_port} {
+    set search_pattern "ssh -f -N -L ${local_port}:"
+    set cmd "pgrep -f \"$search_pattern\""
+
+    if {[catch {exec sh -c $cmd} result]} {
+        return 0
+    }
+
+    if {[string trim $result] ne ""} {
+        return 1
+    }
+
+    return 0
+}
+
+# Check if vncviewer is already running with the specified local port.
+# Returns 1 if vncviewer exists, 0 otherwise.
+proc check_vncviewer_exists {local_port} {
+    set cmd "pgrep -f \"vncviewer localhost:$local_port\""
+
+    if {[catch {exec sh -c $cmd} result]} {
+        return 0
+    }
+
+    if {[string trim $result] ne ""} {
+        return 1
+    }
+
+    return 0
+}
 
 # Check if at least one argument is provided.
 if {$argc == 0} {
@@ -138,151 +219,76 @@ if {$argc == 0} {
     exit 1
 }
 
-# Get the command from the first argument
 set command [lindex $argv 0]
 
-# Handle help command before retrieving secrets
 if {[string equal $command "-h"] || [string equal $command "--help"]} {
     print_usage $argv0
     exit 0
 }
 
-# Retrieve secrets using the helper procedure.
+# Retrieve secrets.
 set username [get_secret "uniqname" "UNIQNAME"]
 set password [get_secret "umlogin" "UM login"]
 set user [get_secret "user" "user"]
 
-# Use a switch statement to execute code based on the command
 switch -- $command {
     "-vc" {
-        # VPN Connect Command
-        puts "Attempting VPN connection..."
-        
-        # Added --background so openconnect daemonizes after authenticating
-        spawn sudo openconnect umvpn.umnet.umich.edu/umvpn-all-traffic-alt --useragent=AnyConnect --disable-ipv6 --background
-
-        expect "password for*"
-        send "$user\r"
-
-        expect "Username:"
-        send "$username\r"
-
-        expect "Password:"
-        send "$password\r"
-
-        # Wait for the "Configured as..." message to confirm the background process is running
-        expect {
-            "Configured as*" {
-                puts "\n>>> VPN connected and backgrounded. Returning to terminal."
-            }
-            timeout {
-                puts "\n>>> Error: Timed out waiting for VPN connection to establish."
-                exit 1
-            }
-        }
+        connect_vpn $user $username $password
     }
 
     "-vd" {
-        # VPN Disconnect Command
-        puts "Attempting VPN disconnection..."
-        
-        # Gracefully kill the openconnect process to restore normal routing
-        spawn sudo pkill -SIGINT openconnect
-
-        expect "password for*"
-        send "$user\r"
-        
-        expect eof
-        puts "VPN disconnected."
+        disconnect_vpn $user
     }
 
     "-s" {
-        # SSH Command
         set hostname "greatlakes.arc-ts.umich.edu"
         puts "Attempting SSH connection to $hostname..."
 
-        spawn ssh $username@$hostname
+        spawn ssh -o ConnectTimeout=45 $username@$hostname
+        set auth_result [authenticate_remote $password 1]
 
-        handle_host_key
-        handle_password_prompt $password
-
-        # Specific prompt for SSH to Greatlakes
-        expect "*?asscode*"
-        send "1\r"
-
-        interact
+        # Usually authenticate_remote hands off to interact after the Okta prompt.
+        # This fallback covers unusual cases where auth completed without Okta.
+        if {$auth_result ne "interacted" && $auth_result ne "eof"} {
+            interact
+        }
     }
 
     "-i" {
-        # Interactive VNC session via SSH tunnel
         if {$argc < 2} {
             puts "Error: -i command requires an SSH command string as an argument."
             puts "Example: vc -i \"ssh -f -N -L 22595:gl3428.arc-ts.umich.edu:5901 smanzoor@greatlakes.arc-ts.umich.edu\""
             exit 1
         }
+
         set ssh_command [lindex $argv 1]
         set local_port ""
 
-        # First, try to extract the local port from the SSH command.
-        # This is needed for the vncviewer check.
         if {![regexp -- {-L\s+(\d+):} $ssh_command match local_port]} {
             puts "Error: Could not extract local port from the SSH command."
             puts "Expected format in command: -L local_port:hostname:remote_port"
             exit 1
         }
 
-        # Determine the status of vncviewer and the SSH tunnel
         set vnc_running [check_vncviewer_exists $local_port]
-        set tunnel_exists [check_tunnel_exists $ssh_command $local_port] ; # Pass local_port for more specific check
+        set tunnel_exists [check_tunnel_exists $local_port]
 
         if {$vnc_running} {
-            # Condition 1: VNC viewer is already running. Gracefully exit.
             puts "VNC viewer is already running for localhost:$local_port. Exiting."
             exit 0
         } elseif {$tunnel_exists} {
-            # Condition 2: VNC viewer is NOT running, but SSH tunnel IS running.
-            # Skip tunnel creation and launch vncviewer.
             puts "SSH tunnel already exists. Skipping tunnel creation."
             puts "Launching VNC viewer for localhost:$local_port."
             if {[catch {exec vncviewer localhost:$local_port &}]} {
                 puts "Error: Could not launch vncviewer. Is it installed and in your PATH?"
             }
         } else {
-            # Condition 3: Neither VNC viewer nor SSH tunnel are running.
-            # Establish SSH tunnel, then launch vncviewer.
             puts "Neither VNC viewer nor SSH tunnel found. Attempting to establish SSH tunnel..."
             puts "Executing: $ssh_command"
 
             spawn {*}$ssh_command
+            authenticate_remote $password 1
 
-            # Expect password and/or Duo prompts. The `interact` command will allow the user
-            # to handle the Duo prompt manually.
-            expect {
-                "*?assword:*" {
-                    send "$password\r"
-                    puts "\nPassword sent."
-                    # After sending password, continue expecting other patterns in this block.
-                    exp_continue
-                }
-                "*?asscode*" {
-                    # Once the passcode prompt appears, give control to the user.
-                    send "1\r"
-                    puts ">>> The script will resume automatically after authentication is complete."
-                    interact
-                }
-                timeout {
-                     puts "\nError: Connection timed out waiting for password or Duo prompt."
-                     exit 1
-                }
-                eof {
-                    # This can happen if a ControlMaster session is active and no password/Duo is needed.
-                    puts "\nSSH command finished without prompting for password or Duo."
-                    puts "Assuming tunnel is active."
-                }
-            }
-
-            # At this point, interact has returned, meaning the ssh -f process has exited
-            # and the tunnel should be established in the background.
             puts "\nAuthentication complete. Waiting for tunnel to stabilize..."
             sleep 2
 
@@ -294,41 +300,24 @@ switch -- $command {
     }
 
     "-f" {
-        # Fetch from greatlakes-xfer (scp)
-        # puts "Clearing local ~/greatlakes directory..."
-        # Use a subshell with 'sh -c' to correctly expand the tilde '~' to the home directory
-        # exec /bin/sh -c "rm -rf ~/greatlakes && mkdir -p ~/greatlakes"
         exec /bin/sh -c "mkdir -p ~/greatlakes"
 
         puts "Fetching files from greatlakes-xfer..."
         set hostname "greatlakes-xfer.arc-ts.umich.edu"
-        # The destination is the user's home directory. scp will create the 'greatlakes' folder there.
         spawn scp -r "${username}@${hostname}:./greatlakes" "$env(HOME)/"
-
-        handle_host_key
-        handle_password_prompt $password
-
-        interact
+        authenticate_remote $password 1
     }
 
     "-p" {
-        # Push to greatlakes-xfer (scp)
         puts "Pushing local ~/greatlakes directory to greatlakes-xfer..."
         set hostname "greatlakes-xfer.arc-ts.umich.edu"
-        # The destination is the remote home directory. scp will copy the local 'greatlakes' directory into it.
         spawn scp -r "$env(HOME)/greatlakes" "${username}@${hostname}:."
-
-        handle_host_key
-        handle_password_prompt $password
-
-        interact
+        authenticate_remote $password 1
     }
 
     default {
-        # Invalid Command
         puts "Error: Unknown command '$command'.\n"
         print_usage $argv0
         exit 1
     }
 }
-
