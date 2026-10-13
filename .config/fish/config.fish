@@ -29,6 +29,8 @@ if status is-interactive
     starship init fish | source
 end
 
+set -x SSH_AUTH_SOCK "$XDG_RUNTIME_DIR/ssh-agent.socket"
+
 # pomodoro
 function pomodoro 
   echo $argv[1] | lolcat
@@ -104,6 +106,8 @@ alias vpn_disconnect '/opt/cisco/secureclient/bin/vpn disconnect'
 # alias vd '/opt/cisco/secureclient/bin/vpn disconnect'
 
 # alias home '/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
+
+alias fix-turbo="fusermount3 -u -z /home/yoyomanzoor/cluster"
 
 # Get the error messages from journalctl
 alias jctl 'journalctl -p 3 -xb'
