@@ -87,27 +87,8 @@ vim.opt.termguicolors = true
 vim.opt.conceallevel = 1
 ----
 
----- for Magma
-local function isempty(s)
-	return s == nil or s == ""
-end
-local function use_if_defined(val, fallback)
-	return val ~= nil and val or fallback
-end
-local mamba_prefix = os.getenv("MAMBA_ROOT_PREFIX")
-if not isempty(mamba_prefix) then
-	if vim.fn.isdirectory(mamba_prefix .. "/envs/py3.12/bin/python") then
-		vim.g.python_host_prog = mamba_prefix .. "/envs/py3.12/bin/python"
-		vim.g.python3_host_prog = mamba_prefix .. "/envs/py3.12/bin/python"
-	end
-	-- vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
-	-- vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, mamba_prefix .. "/envs/py3.12/bin/python")
-else
-	vim.g.python_host_prog = use_if_defined(vim.g.python_host_prog, "python")
-	vim.g.python3_host_prog = use_if_defined(vim.g.python3_host_prog, "python3")
-end
--- vim.g.python3_host_prog = vim.fn.exepath("python3")
--- vim.g.loaded_python3_provider = nil
+-- WSL clipboard, browser, and Python provider.
+require("config.wsl")
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -130,7 +111,7 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-vim.keymap.set("t", "<C-w>", "C-\\><C-w>", { desc = "Cut word in terminal mode" })
+
 
 -- Save and quit while in normal mode
 vim.keymap.set("n", "Q", "<cmd>x<CR>")
@@ -185,12 +166,12 @@ vim.g.transparent_groups = vim.list_extend(vim.g.transparent_groups or {}, { "St
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
+--  See `:help vim.hl.on_yank()`
 vim.api.nvim_create_autocmd("TextYankPost", {
 	desc = "Highlight when yanking (copying) text",
 	group = vim.api.nvim_create_augroup("kickstart-highlight-yank", { clear = true }),
 	callback = function()
-		vim.highlight.on_yank()
+		vim.hl.on_yank()
 	end,
 })
 
@@ -218,12 +199,6 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
-	opts = {
-		rocks = {
-			hererocks = true,
-		},
-	},
-
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 
@@ -321,7 +296,9 @@ require("lazy").setup({
 		"mbbill/undotree",
 		config = function()
 			vim.keymap.set("n", "<leader>tu", vim.cmd.UndotreeToggle)
-			vim.opt.undodir = "/home/yoyomanzoor/.vim/undodir"
+			local undo = vim.fn.stdpath("state") .. "/undo"
+			vim.fn.mkdir(undo, "p")
+			vim.opt.undodir = undo
 		end,
 	},
 
@@ -335,7 +312,6 @@ require("lazy").setup({
 	{ -- Fuzzy Finder (files, lsp, etc)
 		"nvim-telescope/telescope.nvim",
 		event = "VimEnter",
-		branch = "0.1.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			{ -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -387,7 +363,7 @@ require("lazy").setup({
 			})
 
 			require("telescope").load_extension("media_files")
-			require("telescope").load_extension("notify")
+			pcall(function() require("telescope").load_extension("notify") end)
 			require("telescope").load_extension("bibtex")
 
 			-- Enable Telescope extensions if they are installed
@@ -487,8 +463,8 @@ require("lazy").setup({
 		"neovim/nvim-lspconfig",
 		dependencies = {
 			-- Automatically install LSPs and related tools to stdpath for Neovim
-			{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
-			"williamboman/mason-lspconfig.nvim",
+			{ "mason-org/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
+			"mason-org/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 
 			-- Useful status updates for LSP.
@@ -585,7 +561,7 @@ require("lazy").setup({
 					--
 					-- When you move your cursor, the highlights will be cleared (the second autocommand).
 					local client = vim.lsp.get_client_by_id(event.data.client_id)
-					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+					if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
 						local highlight_augroup =
 							vim.api.nvim_create_augroup("kickstart-lsp-highlight", { clear = false })
 						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
@@ -613,7 +589,7 @@ require("lazy").setup({
 					-- code, if the language server you are using supports them
 					--
 					-- This may be unwanted, since they displace some of your code
-					if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+					if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
 						map("<leader>th", function()
 							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
 						end, "[T]oggle Inlay [H]ints")
@@ -734,22 +710,16 @@ require("lazy").setup({
 			-- for you, so that they are available from within Neovim.
 			local ensure_installed = vim.tbl_keys(servers or {})
 			vim.list_extend(ensure_installed, {
+				"markdownlint",
 				"stylua", -- Used to format Lua code
 			})
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
-			require("mason-lspconfig").setup({
-				handlers = {
-					function(server_name)
-						local server = servers[server_name] or {}
-						-- This handles overriding only values explicitly passed
-						-- by the server configuration above. Useful when disabling
-						-- certain features of an LSP (for example, turning off formatting for ts_ls)
-						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-						require("lspconfig")[server_name].setup(server)
-					end,
-				},
-			})
+			for server_name, server in pairs(servers) do
+                server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
+                vim.lsp.config(server_name, server)
+            end
+            require("mason-lspconfig").setup({ ensure_installed = vim.tbl_keys(servers) })
 		end,
 	},
 
@@ -845,7 +815,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-nvim-lsp",
 			"hrsh7th/cmp-path",
 			"kdheepak/cmp-latex-symbols",
-			"R-nvim/cmp-r",
 			"zbirenbaum/copilot-cmp",
 		},
 		config = function()
@@ -853,7 +822,6 @@ require("lazy").setup({
 			local cmp = require("cmp")
 			local compare = cmp.config.compare
 			local luasnip = require("luasnip")
-			require("cmp_r").setup({})
 			luasnip.config.setup({})
 
 			cmp.setup({
@@ -929,7 +897,7 @@ require("lazy").setup({
 					{ name = "luasnip" },
 					{ name = "path" },
 					{ name = "latex_symbols" },
-					{ name = "cmp_r" },
+					-- R.nvim provides its own LSP completion.
 				},
 				sorting = {
 					priority_weight = 1.0,
@@ -1044,47 +1012,6 @@ require("lazy").setup({
 		"xiyaowong/transparent.nvim",
 	},
 
-	---@type LazySpec
-	{
-		"mikavilpas/yazi.nvim",
-		event = "VeryLazy",
-		keys = {
-			-- 👇 in this section, choose your own keymappings!
-			{
-				"<leader>-",
-				mode = { "n", "v" },
-				"<cmd>Yazi<cr>",
-				desc = "Open yazi at the current file",
-			},
-			{
-				-- Open in the current working directory
-				"<leader>cw",
-				"<cmd>Yazi cwd<cr>",
-				desc = "Open the file manager in nvim's working directory",
-			},
-			{
-				-- NOTE: this requires a version of yazi that includes
-				-- https://github.com/sxyazi/yazi/pull/1305 from 2024-07-18
-				"<c-up>",
-				"<cmd>Yazi toggle<cr>",
-				desc = "Resume the last yazi session",
-			},
-		},
-		---@type YaziConfig
-		opts = {
-			-- if you want to open yazi instead of netrw, see below for more info
-			open_for_directories = false,
-			keymaps = {
-				show_help = "<f1>",
-			},
-		},
-		config = function()
-			vim.api.nvim_set_keymap("n", "<leader>ff", "<Cmd>Yazi<CR>", {
-				noremap = true,
-				desc = "[F]ind [F]iles (with Yazi)",
-			})
-		end,
-	},
 
 	-- {
 	-- 	"kelly-lin/ranger.nvim",
@@ -1190,81 +1117,8 @@ require("lazy").setup({
 		end,
 	},
 
-	{ -- Highlight, edit, and navigate code
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		main = "nvim-treesitter.configs", -- Sets main module to use for opts
-		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-		opts = {
-			ensure_installed = {
-				"bash",
-				"bibtex",
-				"c",
-				"cmake",
-				"csv",
-				"diff",
-				"diff",
-				"fish",
-				"gitcommit",
-				"git_config",
-				"gitignore",
-				"go",
-				"gomod",
-				"html",
-				"html",
-				"hyprlang",
-				"java",
-				"javascript",
-				"json",
-				"julia",
-				"latex",
-				"lua",
-				"luadoc",
-				"markdown",
-				"markdown_inline",
-				"matlab",
-				"meson",
-				"perl",
-				"python",
-				"query",
-				"r",
-				"regex",
-				"rnoweb",
-				"ruby",
-				"rust",
-				"toml",
-				"typescript",
-				"vim",
-				"vimdoc",
-				"yaml",
-			},
-			-- Autoinstall languages that are not installed
-			auto_install = true,
-			highlight = {
-				enable = true,
-				-- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-				--  If you are experiencing weird indenting issues, add the language to
-				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
-				additional_vim_regex_highlighting = { "ruby" },
-			},
-			indent = { enable = true, disable = { "ruby" } },
-			incremental_selection = {
-				enable = true,
-				keymaps = {
-					init_selection = "<leader><CR>",
-					scope_incremental = "<leader><CR>",
-					node_incremental = "<leader><TAB>",
-					node_decremental = "<leader><BS>",
-				},
-			},
-		},
-		-- There are additional nvim-treesitter modules that you can use to interact
-		-- with nvim-treesitter. You should go explore a few and see what interests you:
-		--
-		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-	},
+	require("custom.plugins.treesitter"),
+
 	{
 		"nvim-treesitter/nvim-treesitter-context",
 		config = function()
@@ -1341,6 +1195,8 @@ require("lazy").setup({
 	-- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
 	-- you can continue same window with `<space>sr` which resumes last telescope search
 }, {
+    -- All selected plugins ship Lua code; no LuaRocks toolchain is needed.
+    rocks = { enabled = false },
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the
 		-- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table

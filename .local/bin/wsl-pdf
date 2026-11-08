@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ $# -ne 1 ]]; then
+    echo 'usage: wsl-pdf FILE' >&2
+    exit 2
+fi
+if command -v zathura >/dev/null && [[ -n ${WAYLAND_DISPLAY:-}${DISPLAY:-} ]]; then
+    exec zathura "$1"
+fi
+exec wsl-open "$1"

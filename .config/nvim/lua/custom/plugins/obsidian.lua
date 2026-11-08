@@ -1,6 +1,10 @@
 return {
 	"epwalsh/obsidian.nvim",
 	version = "*", -- recommended, use latest release instead of latest commit
+	cond = function()
+        return vim.fn.isdirectory(vim.fn.expand("~/Documents/MedSchool")) == 1
+            or vim.fn.isdirectory(vim.fn.expand("~/Documents/Welch-Lab-Notebook")) == 1
+    end,
 	lazy = true,
 	ft = "markdown",
 	-- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
@@ -15,7 +19,7 @@ return {
 		-- Required.
 		"nvim-lua/plenary.nvim",
 		"nvim-telescope/telescope.nvim",
-		"nvim-treesitter",
+		"nvim-treesitter/nvim-treesitter",
 	},
 	opts = {
 		workspaces = {
@@ -166,7 +170,7 @@ return {
 		follow_url_func = function(url)
 			-- Open the URL in the default web browser.
 			-- vim.fn.jobstart({ "open", url }) -- Mac OS
-			vim.fn.jobstart({ "xdg-open", url }) -- linux
+			vim.fn.jobstart({ "wsl-open", url }) -- linux
 			-- vim.ui.open(url) -- need Neovim 0.10.0+
 		end,
 
@@ -174,7 +178,7 @@ return {
 		-- file it will be ignored but you can customize this behavior here.
 		---@param img string
 		follow_img_func = function(img)
-			vim.fn.jobstart({ "xdg-open", img }) -- linux
+			vim.fn.jobstart({ "wsl-open", img }) -- linux
 		end,
 
 		picker = {

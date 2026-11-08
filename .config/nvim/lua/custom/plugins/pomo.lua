@@ -33,23 +33,11 @@ return {
 				},
 			},
 
-			-- The "System" notifier sends a system notification when the timer is finished.
-			-- Available on MacOS and Windows natively and on Linux via the `libnotify-bin` package.
-			{ name = "System" },
-
 			-- You can also define custom notifiers by providing an "init" function instead of a name.
 			-- See "Defining custom notifiers" below for an example 👇
 			-- { init = function(timer) ... end }
 		},
 
-		-- Override the notifiers for specific timer names.
-		timers = {
-			-- For example, use only the "System" notifier when you create a timer called "Break",
-			-- e.g. ':TimerStart 2m Break'.
-			Break = {
-				{ name = "System" },
-			},
-		},
 		-- You can optionally define custom timer sessions.
 		sessions = {
 			-- Example session configuration for a session called "pomodoro".

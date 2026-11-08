@@ -6,7 +6,7 @@ return {
 		config = function()
 			-- vim.g["w3m#search_engine"] = "%s"
 			vim.g["w3m#search_engine"] = "https://duckduckgo.com/?q=%s"
-			vim.g["w3m#external_browser"] = "vieb"
+			vim.g["w3m#external_browser"] = "wsl-open"
 			vim.keymap.set("n", "<leader>e", ":W3m ", { desc = "Search the web" })
 			vim.keymap.set("n", "<leader>E", "<cmd>W3mAddressBar<CR>", { desc = "Open Address Bar" })
 			vim.keymap.set("n", "<leader>wr", "<cmd>W3mReload<CR>", { desc = "[W]eb [R]eload" })
@@ -17,8 +17,8 @@ return {
 			vim.keymap.set(
 				"n",
 				"<leader>we",
-				vim.cmd("call w3m#ShowExternalBrowser()"),
-				{ desc = "open in [E]xternal browser (vieb)" }
+				"<cmd>call w3m#ShowExternalBrowser()<CR>",
+				{ desc = "Open in Windows browser" }
 			)
 
 			vim.keymap.set("n", "<leader>wy", function()
@@ -130,20 +130,12 @@ return {
 					print("No bookmarks found.")
 					return
 				end
-				local fzf_input = table.concat(bookmarks, "\n")
-				local selected = vim.fn.systemlist("echo '" .. fzf_input:gsub("'", "'\\''") .. "' | fzf")[1]
-				vim.cmd("call fzf#run({ 'source': bookmarks, 'sink': 'W3m'})")
-
-				if not selected or selected == "" then
-					print("No bookmarks selected")
-					return
-				end
-				local url = selected:match("%((https?://.-)%)")
-				if not url then
-					print("Failed to extract URL from selection")
-					return
-				end
-				-- vim.cmd("W3m " .. url)
+                vim.ui.select(bookmarks, { prompt = "Web bookmark" }, function(selected)
+                    if selected then
+                        local url = selected:match("%((https?://.-)%)")
+                        if url then vim.cmd("W3m " .. vim.fn.fnameescape(url)) end
+                    end
+                end)
 			end, { desc = "Load [W]eb Bookmark" })
 		end,
 	},

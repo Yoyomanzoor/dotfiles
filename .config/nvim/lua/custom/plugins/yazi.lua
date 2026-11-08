@@ -3,6 +3,7 @@ return {
 	"mikavilpas/yazi.nvim",
 	event = "VeryLazy",
 	keys = {
+		{ "<leader>ff", "<cmd>Yazi<cr>", desc = "Find files with Yazi" },
 		-- 👇 in this section, choose your own keymappings!
 		{
 			"<leader>-",

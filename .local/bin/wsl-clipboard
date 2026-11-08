@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""UTF-8 Windows clipboard bridge; no Wayland/X11 session required."""
+import subprocess
+import sys
+
+if len(sys.argv) != 2 or sys.argv[1] not in ("copy", "paste"):
+    sys.exit("usage: wsl-clipboard copy|paste")
+encoding = "[Console]::InputEncoding = [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false); "
+if sys.argv[1] == "copy":
+    script = encoding + "Set-Clipboard -Value ([Console]::In.ReadToEnd())"
+else:
+    script = encoding + '[Console]::Out.Write(([string](Get-Clipboard -Raw)).Replace("`r`n", "`n"))'
+try:
+    result = subprocess.run(
+        ["powershell.exe", "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script],
+        check=False,
+    )
+    sys.exit(result.returncode)
+except FileNotFoundError:
+    sys.exit("powershell.exe not found: enable WSL Windows interoperability and appendWindowsPath")

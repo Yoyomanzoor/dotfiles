@@ -1,8 +1,0 @@
-    "custom/weather": {
-        "format": "{}°",
-        "rotate": ${r_deg},
-        "tooltip": true,
-        "interval": 3600,
-        "exec": "wttrbar --fahrenheit --mph --ampm --date-format='%m/%d/%Y'",
-        "return-type": "json"
-    },

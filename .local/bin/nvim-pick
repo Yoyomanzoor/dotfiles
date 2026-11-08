@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+"""Pick one file without splitting spaces, newlines, or shell metacharacters."""
+import os
+import subprocess
+
+finder = subprocess.Popen(["fd", "--type", "f", "--hidden", "--exclude", ".git", "--print0"], stdout=subprocess.PIPE)
+try:
+    result = subprocess.run([
+        "fzf", "--read0", "--print0", "--reverse", "--preview=bat --color=always -- {}",
+    ], stdin=finder.stdout, stdout=subprocess.PIPE)
+finally:
+    finder.stdout.close()
+    finder.wait()
+if result.returncode == 0 and result.stdout:
+    os.execvp("nvim", ["nvim", "--", os.fsdecode(result.stdout.removesuffix(b"\0"))])
