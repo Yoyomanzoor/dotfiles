@@ -30,9 +30,9 @@ return {
 
 			-- Windows Terminal: text in Neovim, plots in the Windows image viewer.
 			vim.g.molten_image_provider = "none"
-            vim.g.molten_open_cmd = "wsl-open"
-            vim.g.molten_auto_image_popup = true
-            vim.env.BROWSER = "wsl-open"
+			vim.g.molten_open_cmd = "wsl-open"
+			vim.g.molten_auto_image_popup = true
+			vim.env.BROWSER = "wsl-open"
 
 			-- optional, I like wrapping. works for virt text and the output window
 			vim.g.molten_wrap_output = true
@@ -89,7 +89,7 @@ return {
 		end,
 	},
 	{
-		"GCBallesteros/jupytext.nvim",
+		"goerz/jupytext.nvim",
 		config = function()
 			require("jupytext").setup({
 				style = "markdown",
