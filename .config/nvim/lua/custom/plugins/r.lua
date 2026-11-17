@@ -7,7 +7,9 @@ return {
 			require("r").setup({
 				-- pipe_keymap = "",
 				disable_cmds = { "RInsertPipe" },
-				R_app = vim.fn.executable("radian") == 1 and "radian" or "R",
+				R_app = vim.fn.expand("~/.local/bin/radian"),
+				R_cmd = "/usr/sbin/R",
+				external_term = "",
 				view_df = {
 					open_app = "tmux new-window vd", -- How to open the CSV
 					how = "vsplit", -- How to display the data if doing it within Neovim
